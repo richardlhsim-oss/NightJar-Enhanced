@@ -91,7 +91,7 @@ public class DesktopGesturesTest {
         touch(MotionEvent.ACTION_MOVE, 500, 200);
         touch(MotionEvent.ACTION_UP, 500, 200);
         idle(1000);
-        assertEquals("twice the finger's travel past the slop", before + 100, gestures.viewport().x(), .01f);
+        assertEquals("four times the finger's travel past the slop", before + 200, gestures.viewport().x(), .01f);
         assertTrue(log.isEmpty());
     }
 

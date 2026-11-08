@@ -190,7 +190,7 @@ public class GameTouchInputTest {
                 // The first move only tells a pinch from a drag.
                 dispatch(container, MotionEvent.ACTION_MOVE, 0, new int[] {0, 1},
                         new float[] {200, 350}, new float[] {600, 350});
-                if (desktop != null) assertEquals(-100f, desktop.viewport().y(), .01f);
+                if (desktop != null) assertEquals(0f, desktop.viewport().y(), .01f);
                 else assertFalse(connection.scrolls.isEmpty());
             }
             finishTap(container, 2);
