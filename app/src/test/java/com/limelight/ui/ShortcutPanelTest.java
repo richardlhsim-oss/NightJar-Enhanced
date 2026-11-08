@@ -58,14 +58,14 @@ public class ShortcutPanelTest {
             assertEquals(panel.height(), ((FrameLayout.LayoutParams) stream.getLayoutParams()).bottomMargin);
 
             MaterialButton ctrl = find(parent, activity.getString(R.string.shortcut_key_ctrl));
-            android.graphics.drawable.Drawable off = ctrl.getBackground();
             ctrl.performClick();
             assertTrue(anyHeld);
-            assertTrue("highlighted", ctrl.getBackground() != off);
+            assertTrue("highlighted", ctrl.isChecked());
             assertEquals(List.of(KeyEvent.KEYCODE_CTRL_LEFT + " down"), keys);
 
             ctrl.performClick();
             assertFalse(anyHeld);
+            assertFalse(ctrl.isChecked());
             assertEquals(List.of(KeyEvent.KEYCODE_CTRL_LEFT + " down", KeyEvent.KEYCODE_CTRL_LEFT + " up"), keys);
 
             ctrl.performClick();

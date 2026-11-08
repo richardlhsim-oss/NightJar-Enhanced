@@ -705,9 +705,15 @@ final class GameConnection {
             game.clipboardSync.stop();
             game.clipboardSync = null;
         }
-        if (game.conn == null || !game.conn.askedForClipboardSync()) return;
-        if (!MoonBridge.isRustStream()) {
-            LimeLog.warning("Clipboard sync: needs the New streaming engine; this stream has none");
+        if (game.httpClipboardSync != null) {
+            game.httpClipboardSync.stop();
+            game.httpClipboardSync = null;
+        }
+        if (game.conn == null) return;
+        if (!game.conn.askedForClipboardSync() || !MoonBridge.isRustStream()) {
+            game.httpClipboardSync = com.limelight.utils.HttpClipboardSync.forStream(game, game.conn,
+                    text -> game.messages.alert(text, Toast.LENGTH_LONG));
+            game.httpClipboardSync.start(game.hasWindowFocus());
             return;
         }
         game.clipboardSync = com.limelight.utils.ClipboardSync.forStream(game,
@@ -877,6 +883,10 @@ final class GameConnection {
         if (game.clipboardSync != null) {
             game.clipboardSync.stop();
             game.clipboardSync = null;
+        }
+        if (game.httpClipboardSync != null) {
+            game.httpClipboardSync.stop();
+            game.httpClipboardSync = null;
         }
         // Before the connection stops: detaching tells the host.
         if (game.usbForwarding != null) {

@@ -396,6 +396,7 @@ public class Game extends Activity implements SurfaceHolder.Callback, TextureVie
     com.limelight.binding.usb.UsbForwarding usbForwarding;
     // Clipboard sync (0x5508) while this stream's PC runs it.
     com.limelight.utils.ClipboardSync clipboardSync;
+    com.limelight.utils.HttpClipboardSync httpClipboardSync;
     final Runnable showStreamMenuHint = overlays::showStreamMenuHint;
 
     MediaCodecDecoderRenderer decoderRenderer;
@@ -784,6 +785,9 @@ public class Game extends Activity implements SurfaceHolder.Callback, TextureVie
         // A copy made in another app goes once the stream is back in front.
         if (clipboardSync != null) {
             clipboardSync.focusChanged(hasFocus);
+        }
+        if (httpClipboardSync != null) {
+            httpClipboardSync.focusChanged(hasFocus);
         }
         if (hasFocus) {
             // Let Android finish restoring IME focus before running a menu action.

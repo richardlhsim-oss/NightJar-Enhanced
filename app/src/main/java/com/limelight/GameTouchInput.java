@@ -89,7 +89,7 @@ final class GameTouchInput {
     private float lastAbsTouchUpX, lastAbsTouchUpY;
     private float lastAbsTouchDownX, lastAbsTouchDownY;
 
-    private static final float PANEL_CORNER_DP = 96, PANEL_SWIPE_DP = 40;
+    private static final float PANEL_EDGE_DP = 32, PANEL_SWIPE_DP = 40;
     private static final int CLICK_HOLD_MS = 40, CLICK_GAP_MS = 60;
     private MotionEvent edgeDown;
     private boolean panelSwallowsGesture;
@@ -1290,7 +1290,7 @@ final class GameTouchInput {
     }
 
     /**
-     * A finger landing in the bottom-left corner waits here until it swipes up or right, which shows or hides the bar;
+     * A finger landing on the left edge waits here until it swipes right, which shows or hides the bar;
      * anything else then reaches the stream from its first event.
      */
     private boolean routeEdgeSwipe(View view, MotionEvent event) {
@@ -1306,8 +1306,7 @@ final class GameTouchInput {
             View parent = (View) game.streamView.getParent();
             int[] at = new int[2];
             parent.getLocationOnScreen(at);
-            if (at[1] + parent.getHeight() - panel.height() - event.getRawY() < PANEL_CORNER_DP * density &&
-                    event.getRawX() - at[0] < PANEL_CORNER_DP * density) {
+            if (event.getRawX() - at[0] < PANEL_EDGE_DP * density) {
                 edgeDown = MotionEvent.obtain(event);
                 return true;
             }
@@ -1316,7 +1315,7 @@ final class GameTouchInput {
         if (edgeDown == null) return false;
         float dx = event.getRawX() - edgeDown.getRawX(), dy = event.getRawY() - edgeDown.getRawY();
         if (action == MotionEvent.ACTION_MOVE) {
-            if (-dy > PANEL_SWIPE_DP * density || dx > PANEL_SWIPE_DP * density) {
+            if (dx > PANEL_SWIPE_DP * density && dx > 2 * Math.abs(dy)) {
                 edgeDown.recycle();
                 edgeDown = null;
                 panelSwallowsGesture = true;
