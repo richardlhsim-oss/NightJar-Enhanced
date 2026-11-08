@@ -366,6 +366,7 @@ public class Game extends Activity implements SurfaceHolder.Callback, TextureVie
     StreamView renderView;
     com.limelight.ui.StreamPresentation externalPresentation;
     com.limelight.ui.DesktopGestures desktopGestures;
+    com.limelight.ui.ShortcutPanel shortcutPanel;
     com.limelight.ui.GameTouchControls gameTouchControls;
     boolean outputSwitchPending;
     Surface videoSurface;

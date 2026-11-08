@@ -270,13 +270,13 @@ public class FrontendEntryTest {
         assertTrue(systems.contains("<name>butterpollo</name>"));
         assertTrue(systems.contains("<fullname>Nightjar &amp; Co</fullname>"));
         assertTrue(systems.contains("%EMULATOR_BUTTERPOLLO%"));
-        assertTrue(systems.contains("<command label=\"Nightjar\">"));
+        assertTrue(systems.contains("<command label=\"NightJar Enhanced\">"));
         assertTrue(systems.contains("%DATA%=%ROMPROVIDER%"));
         assertTrue(systems.trim().endsWith("</systemList>"));
 
         String rules = FrontendEntry.mergeEsFindRules("", "com.butterpollo.client");
         assertTrue(rules.contains("<entry>com.butterpollo.client/com.limelight.ShortcutTrampoline</entry>"));
-        assertTrue(rules.contains("<!-- Nightjar game streaming client -->"));
+        assertTrue(rules.contains("<!-- NightJar Enhanced game streaming client -->"));
         assertTrue(rules.trim().endsWith("</ruleList>"));
     }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortcut_panel_title" translatable="false">Shortcuts</string>
+    <string name="shortcut_panel_hold" translatable="false">Hold</string>
+    <string name="shortcut_panel_input" translatable="false">Input</string>
+    <string name="shortcut_panel_keys" translatable="false">Keys</string>
+    <string name="shortcut_panel_shortcuts" translatable="false">Shortcuts</string>
+    <string name="shortcut_key_win" translatable="false">Win</string>
+    <string name="shortcut_key_ctrl" translatable="false">Ctrl</string>
+    <string name="shortcut_key_alt" translatable="false">Alt</string>
+    <string name="shortcut_key_shift" translatable="false">Shift</string>
+    <string name="shortcut_keyboard" translatable="false">Keyboard</string>
+    <string name="shortcut_voice_typing" translatable="false">Voice typing</string>
+</resources>

@@ -89,6 +89,11 @@ final class GameTouchInput {
     private float lastAbsTouchUpX, lastAbsTouchUpY;
     private float lastAbsTouchDownX, lastAbsTouchDownY;
 
+    private static final float PANEL_EDGE_DP = 56, PANEL_SWIPE_DP = 40;
+    private static final int CLICK_HOLD_MS = 40, CLICK_GAP_MS = 60;
+    private MotionEvent edgeDown;
+    private boolean panelSwallowsGesture;
+
     // A USB or Bluetooth mouse, not a touchscreen or a virtual device.
     boolean hasExternalMouse() {
         for (int id : InputDevice.getDeviceIds()) {
@@ -255,6 +260,39 @@ final class GameTouchInput {
         }
         return true;
     }
+
+    private boolean isConfiguringControls() {
+        return (game.gameTouchControls != null && game.gameTouchControls.isEditing()) ||
+                (game.virtualController != null &&
+                        game.virtualController.getControllerMode() != VirtualController.ControllerMode.Active) ||
+                (game.modernController != null && game.modernController.isEditing());
+    }
+
+    final com.limelight.ui.DesktopGestures.Pointer gesturePointer = new com.limelight.ui.DesktopGestures.Pointer() {
+        @Override public void moveTo(float x, float y) {
+            game.conn.sendMousePosition((short) x, (short) y, (short) game.streamView.getWidth(), (short) game.streamView.getHeight());
+        }
+        @Override public void button(boolean down) {
+            if (down) game.conn.sendMouseButtonDown(MouseButtonPacket.BUTTON_LEFT);
+            else game.conn.sendMouseButtonUp(MouseButtonPacket.BUTTON_LEFT);
+        }
+        // Held briefly with a pause between, so a double click selects a word instead of arriving as one burst.
+        @Override public void click() {
+            button(true);
+            game.bitrateHandler.postDelayed(() -> button(false), CLICK_HOLD_MS);
+            game.streamView.onHostClick();
+        }
+        @Override public void doubleClick() {
+            click();
+            game.bitrateHandler.postDelayed(this::click, CLICK_HOLD_MS + CLICK_GAP_MS);
+        }
+        @Override public void scroll(float vertical, float horizontal) {
+            short v = desktopDelta(desktopScrollV, vertical);
+            short h = desktopDelta(desktopScrollH, horizontal);
+            if (v != 0) game.conn.sendMouseHighResScroll(v);
+            if (h != 0) game.conn.sendMouseHighResHScroll(h);
+        }
+    };
 
     void clickRightMouseButton() {
         if (rightButtonUpPending) {
@@ -1247,13 +1285,69 @@ final class GameTouchInput {
     boolean onTouch(View view, MotionEvent event) {
         noteTouchArrivals(event);
         game.keyboardInput.noteStreamPress(view, event);
-        if (game.desktopGestures != null && game.desktopGestures.enabled() && game.foreground && game.connected && game.streamMenu == null) {
+        if (routeEdgeSwipe(view, event)) return true;
+        return dispatchStreamTouch(view, event);
+    }
+
+    /**
+     * A finger landing at the bottom waits here until it is a swipe up, which shows or hides the bar;
+     * anything else then reaches the stream from its first event.
+     */
+    private boolean routeEdgeSwipe(View view, MotionEvent event) {
+        int action = event.getActionMasked();
+        if (panelSwallowsGesture) {
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) panelSwallowsGesture = false;
+            return true;
+        }
+        com.limelight.ui.ShortcutPanel panel = game.shortcutPanel;
+        if (panel == null || !game.foreground || !game.connected || game.streamMenu != null) return false;
+        float density = game.getResources().getDisplayMetrics().density;
+        if (action == MotionEvent.ACTION_DOWN) {
+            View parent = (View) game.streamView.getParent();
+            int[] at = new int[2];
+            parent.getLocationOnScreen(at);
+            // The system takes the very last pixels for its own gesture, so the zone starts well above them.
+            if (at[1] + parent.getHeight() - panel.height() - event.getRawY() < PANEL_EDGE_DP * density) {
+                edgeDown = MotionEvent.obtain(event);
+                return true;
+            }
+            return false;
+        }
+        if (edgeDown == null) return false;
+        float dx = event.getRawX() - edgeDown.getRawX(), dy = event.getRawY() - edgeDown.getRawY();
+        if (action == MotionEvent.ACTION_MOVE) {
+            if (-dy > PANEL_SWIPE_DP * density && -dy > 2 * Math.abs(dx)) {
+                edgeDown.recycle();
+                edgeDown = null;
+                panelSwallowsGesture = true;
+                panel.toggle();
+                return true;
+            }
+            if (Math.hypot(dx, dy) < PANEL_SWIPE_DP * density) return true;
+        }
+        MotionEvent down = edgeDown;
+        edgeDown = null;
+        try { dispatchStreamTouch(view, down); }
+        finally { down.recycle(); }
+        return false;
+    }
+
+    private boolean dispatchStreamTouch(View view, MotionEvent event) {
+        // Multi-touch hands the fingers to the host, and an app there may want its own two-finger gestures.
+        boolean direct = touchMode() == TouchMode.DIRECT && game.grabbedInput && !isConfiguringControls();
+        boolean gestures = game.desktopGestures != null && !game.nativeTouchEnabled &&
+                (game.desktopGestures.enabled() || direct);
+        if (gestures && game.foreground && game.connected && game.streamMenu == null) {
+            if (direct && event.getToolType(0) == MotionEvent.TOOL_TYPE_FINGER && handleFingerTapGesture(event)) {
+                game.desktopGestures.cancelTouch();
+                return true;
+            }
             MotionEvent relative = MotionEvent.obtain(event);
             relative.offsetLocation(getStreamViewOffsetX(view), getStreamViewOffsetY(view));
             boolean handled;
             try {
                 handled = game.desktopGestures.onTouch(relative, game.grabbedInput &&
-                        TouchMode.isRelative(touchMode()) && isInTrackpadArea(view, event));
+                        (direct || (TouchMode.isRelative(touchMode()) && isInTrackpadArea(view, event))), direct);
             }
             finally { relative.recycle(); }
             if (handled) {

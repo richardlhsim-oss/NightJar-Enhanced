@@ -200,6 +200,7 @@ final class GameKeyboardInput {
     void onKeyboardInsets(boolean visible, int imeBottom) {
         if (game.streamView == null) return;
         keyboardInsetBottom = imeBottom;
+        if (game.shortcutPanel != null) game.shortcutPanel.setKeyboardInset(imeBottom);
         if (hostKeyboard.onVisibility(visible, SystemClock.uptimeMillis())) {
             LimeLog.info(hostKeyboard.visible() ? "Soft keyboard shown" : "Soft keyboard hidden");
         }
@@ -214,7 +215,9 @@ final class GameKeyboardInput {
         float pan = 0;
         View parent = (View) game.streamView.getParent();
         if (parent != null) {
-            pan = hostKeyboard.pan(parent.getHeight(), keyboardInsetBottom, game.streamView.getTop(), game.streamView.getHeight(),
+            int bar = game.shortcutPanel != null ? game.shortcutPanel.height() : 0;
+            if (game.shortcutPanel != null) game.shortcutPanel.setKeyboardInset(keyboardInsetBottom);
+            pan = hostKeyboard.pan(parent.getHeight(), keyboardInsetBottom + bar, game.streamView.getTop(), game.streamView.getHeight(),
                     HostKeyboard.MARGIN_DP * game.getResources().getDisplayMetrics().density);
         }
         if (pan == game.streamView.getTranslationY()) return;

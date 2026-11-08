@@ -59,9 +59,9 @@ public class CustomResolutionTest {
     private AlertDialog editor(ResolutionPreference pref) {
         pref.showDialog(null);
         AlertDialog picker = (AlertDialog) ShadowDialog.getLatestDialog();
-        assertEquals(app.getString(R.string.resolution_custom),
-                picker.getButton(AlertDialog.BUTTON_POSITIVE).getText().toString());
-        picker.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        int last = picker.getListView().getCount() - 1;
+        assertEquals(app.getString(R.string.resolution_custom), picker.getListView().getItemAtPosition(last).toString());
+        picker.getListView().performItemClick(null, last, 0);
         ShadowLooper.idleMainLooper();
         return (AlertDialog) ShadowDialog.getLatestDialog();
     }

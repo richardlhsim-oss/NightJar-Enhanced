@@ -187,6 +187,9 @@ public class GameTouchInputTest {
             } else {
                 dispatch(container, MotionEvent.ACTION_MOVE, 0, new int[] {0, 1},
                         new float[] {200, 250}, new float[] {600, 250});
+                // The first move only tells a pinch from a drag.
+                dispatch(container, MotionEvent.ACTION_MOVE, 0, new int[] {0, 1},
+                        new float[] {200, 350}, new float[] {600, 350});
                 if (desktop != null) assertEquals(-100f, desktop.viewport().y(), .01f);
                 else assertFalse(connection.scrolls.isEmpty());
             }
@@ -217,7 +220,7 @@ public class GameTouchInputTest {
             Shadows.shadowOf(Looper.getMainLooper()).idleFor(100, TimeUnit.MILLISECONDS);
             assertEquals(-200f, desktop.viewport().y(), 0);
             assertEquals(2f, desktop.viewport().scale(), 0);
-            assertEquals(policy, policy.equals("allowed") ? java.util.Arrays.asList("down 3", "up 3") :
+            assertEquals(policy, policy.equals("allowed") || policy.equals("direct") ? java.util.Arrays.asList("down 3", "up 3") :
                     Collections.emptyList(), connection.buttons);
             assertTrue(connection.heldTouches.isEmpty());
         }

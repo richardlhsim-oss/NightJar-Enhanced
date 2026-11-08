@@ -28,7 +28,7 @@
     <string name="desktop_zoom_enable">Enable pinch zoom and pan</string>
     <string name="desktop_zoom_disable">Disable pinch zoom and pan</string>
     <string name="desktop_zoom_reset">Reset zoom</string>
-    <string name="desktop_zoom_help">Pinch with two fingers to zoom up to 4×; drag two fingers to pan. One finger keeps the selected touch mode. Two-finger scrolling is replaced while zoom controls are enabled.</string>
+    <string name="desktop_zoom_help">Pinch anywhere to zoom up to 4×; drag two fingers to scroll. One finger pans, a tap clicks, a double tap double clicks, and a double tap then move drags.</string>
     <string name="desktop_zoom_surface_help">On Android 5 and 6, enable TextureView in streaming settings and reconnect to use zoom.</string>
     <string name="desktop_output">Video output (reconnects stream)</string>
     <string name="desktop_output_device">This device</string>

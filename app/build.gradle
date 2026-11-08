@@ -199,6 +199,8 @@ android {
             resValue "string", "app_label_root", "${brandName} (Root Debug)"
         }
         release {
+            // -PreleaseIdSuffix=.enhanced installs beside the upstream app, whose signing key this fork does not have.
+            applicationIdSuffix project.findProperty("releaseIdSuffix") ?: ""
             resValue "string", "app_label", brandName
             resValue "string", "app_label_root", "${brandName} (Root)"
 

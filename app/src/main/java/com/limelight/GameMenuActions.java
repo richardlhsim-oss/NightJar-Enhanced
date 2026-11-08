@@ -56,6 +56,7 @@ final class GameMenuActions {
     };
 
     void showStreamDialog(android.app.Dialog dialog) {
+        if (game.shortcutPanel != null) game.shortcutPanel.close();
         game.keyboardInput.hidePcKeyboard();
         game.touchInput.setInputGrabState(false);
         game.suppressPipRefCount++;

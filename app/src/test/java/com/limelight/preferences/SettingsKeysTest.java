@@ -453,8 +453,8 @@ public class SettingsKeysTest {
     public void touchModeKeepsTheOlderSwitchesAndAddsTheNewerModes() {
         Application app = RuntimeEnvironment.getApplication();
         PreferenceConfiguration config = PreferenceConfiguration.readPreferences(app);
-        assertEquals(com.limelight.binding.input.touch.TouchMode.TRACKPAD, config.touchMode);
-        assertTrue(config.touchscreenTrackpad);
+        assertEquals(com.limelight.binding.input.touch.TouchMode.DIRECT, config.touchMode);
+        assertFalse(config.touchscreenTrackpad);
 
         prefs().edit().putBoolean("checkbox_touchscreen_trackpad", false).putBoolean("checkbox_native_touch", true).commit();
         assertEquals(com.limelight.binding.input.touch.TouchMode.MULTI_TOUCH,

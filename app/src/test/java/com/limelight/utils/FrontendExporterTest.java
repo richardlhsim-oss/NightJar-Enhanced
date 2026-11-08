@@ -107,7 +107,7 @@ public class FrontendExporterTest {
         assertTrue(file("esde/downloaded_media/butterpollo/covers/Old name.png").isFile());
         String systems = Files.readString(file("esde/custom_systems/es_systems.xml").toPath());
         assertTrue(systems.contains("<name>butterpollo</name>"));
-        assertTrue(systems.contains("<fullname>Nightjar</fullname>"));
+        assertTrue(systems.contains("<fullname>NightJar Enhanced</fullname>"));
     }
 
     @Test

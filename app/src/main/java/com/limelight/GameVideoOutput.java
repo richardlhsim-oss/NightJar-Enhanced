@@ -260,6 +260,8 @@ final class GameVideoOutput {
         }
     }
 
+    static final String ZOOM_PREF = "enhanced_desktop_zoom";
+
     void toggleDesktopZoom() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N && !game.prefConfig.useTextureView) {
             game.menuActions.showStreamDialog(new NavigationDialogBuilder(game).setMessage(R.string.desktop_zoom_surface_help)
@@ -267,6 +269,8 @@ final class GameVideoOutput {
             return;
         }
         game.desktopGestures.setEnabled(!game.desktopGestures.enabled());
+        android.preference.PreferenceManager.getDefaultSharedPreferences(game).edit()
+                .putBoolean(ZOOM_PREF, game.desktopGestures.enabled()).apply();
         if (game.desktopGestures.enabled()) game.messages.alert(R.string.desktop_zoom_help, Toast.LENGTH_LONG);
     }
 

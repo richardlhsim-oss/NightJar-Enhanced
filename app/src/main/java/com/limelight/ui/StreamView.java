@@ -27,6 +27,8 @@ public class StreamView extends FrameLayout {
     private InputCallbacks inputCallbacks;
     private HostTextField hostTextField;
     private boolean pressPosted;
+    private boolean voiceTyping;
+    private HostTextField voiceField;
     private SurfaceView surfaceView;
     private TextureView textureView;
 
@@ -151,6 +153,26 @@ public class StreamView extends FrameLayout {
         return hostTextField;
     }
 
+    /**
+     * Without a host text field, TYPE_NULL leaves dictation and swipe typing nothing to edit. Voice
+     * typing gives the IME a local text field instead, its edits sent as they are for a host field.
+     */
+    public void setVoiceTyping(boolean on) {
+        if (on == voiceTyping) return;
+        voiceTyping = on;
+        voiceField = null;
+        InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (inputManager != null) inputManager.restartInput(this);
+    }
+
+    /** A click may have moved the host's caret: the IME starts over rather than diff against old text. */
+    public void onHostClick() {
+        if (voiceField == null || hostTextField != null) return;
+        voiceField.finishComposing();
+        InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (inputManager != null) inputManager.restartInput(this);
+    }
+
     public StreamView(Context context) {
         super(context);
     }
@@ -175,6 +197,9 @@ public class StreamView extends FrameLayout {
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         HostTextField field = hostTextField;
+        if (field == null && voiceTyping) {
+            field = voiceField = new HostTextField(HostTextField.TYPE_TEXT, HostTextField.FLAG_ENTER_ACTION);
+        }
         if (field != null) {
             outAttrs.inputType = field.inputType();
             outAttrs.imeOptions = field.imeOptions();

@@ -79,6 +79,8 @@ import java.security.cert.X509Certificate;
 
 /** The stream's connection: starting it on the video surface, the connection's stages and status, its messages and launch confirmations, losing and regaining the network, and stopping it. */
 final class GameConnection {
+    private static final String VOICE_TYPING_PREF = "enhanced_voice_typing";
+
     private final Game game;
 
     GameConnection(Game game) {
@@ -568,6 +570,25 @@ final class GameConnection {
         game.desktopGestures = new com.limelight.ui.DesktopGestures(game, game.streamView,
                 game.touchInput::cancelHostTouchInput, game.touchInput::clickRightMouseButton);
         game.trackpadPointer.setViewport(game.desktopGestures.viewport());
+        game.desktopGestures.setPointer(game.touchInput.gesturePointer);
+        android.content.SharedPreferences enhancedPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(game);
+        game.desktopGestures.setEnabled(enhancedPrefs.getBoolean(com.limelight.GameVideoOutput.ZOOM_PREF, true) &&
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || game.prefConfig.useTextureView));
+        boolean voiceTyping = enhancedPrefs.getBoolean(VOICE_TYPING_PREF, true);
+        game.streamView.setVoiceTyping(voiceTyping);
+        game.shortcutPanel = new com.limelight.ui.ShortcutPanel(game, (android.view.ViewGroup) game.streamView.getParent(), game.streamView, voiceTyping,
+                new com.limelight.ui.ShortcutPanel.Host() {
+                    @Override public void key(int keyCode, boolean down) { game.keyboardInput.sendCustomKey(keyCode, down); }
+                    @Override public void toggleKeyboard() { game.toggleKeyboard(); }
+                    @Override public void setVoiceTyping(boolean on) {
+                        enhancedPrefs.edit().putBoolean(VOICE_TYPING_PREF, on).apply();
+                        game.streamView.setVoiceTyping(on);
+                    }
+                    @Override public void layoutChanged() {
+                        game.keyboardPanHandler.removeCallbacks(game.keyboardPan);
+                        game.keyboardPanHandler.post(game.keyboardPan);
+                    }
+                });
         if (game.app.getRole() != NvApp.Role.REMOTE_MONITOR) {
             String profile = com.limelight.binding.input.TouchLayout.profileKey(game.getIntent().getStringExtra(Game.EXTRA_PC_UUID),
                     game.app.getAppUuid(), game.app.getAppId());

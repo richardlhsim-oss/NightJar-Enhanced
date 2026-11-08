@@ -48,7 +48,18 @@ public class ResolutionPreference extends MaterialListPreference {
 
     @Override
     protected void customizePicker(MaterialAlertDialogBuilder builder) {
-        builder.setPositiveButton(R.string.resolution_custom, (dialog, which) -> showCustomResolution());
+        // Custom… is the last row of the list, beside the sizes it adds to.
+        CharSequence[] names = Arrays.copyOf(getEntries(), getEntries().length + 1);
+        names[names.length - 1] = getContext().getString(R.string.resolution_custom);
+        builder.setSingleChoiceItems(names, findIndexOfValue(getValue()), (dialog, which) -> {
+            dialog.dismiss();
+            if (which == names.length - 1) {
+                showCustomResolution();
+                return;
+            }
+            String value = getEntryValues()[which].toString();
+            if (callChangeListener(value)) setValue(value);
+        });
     }
 
     private void showCustomResolution() {
