@@ -781,6 +781,9 @@ final class GameVideoOutput {
             return;
         }
         int[] size = game.decoderRenderer.getStreamSize();
+        LimeLog.info("Build " + com.limelight.BuildConfig.VERSION_NAME + ": asked " + launchWidth + "x" + launchHeight + ", receiving " + size[0] + "x" + size[1]);
+        game.messages.alert(game.getString(R.string.stream_size_check, com.limelight.BuildConfig.VERSION_NAME,
+                launchWidth, launchHeight, size[0], size[1]), Toast.LENGTH_LONG);
         streamStartedLandscape = size[0] >= size[1];
         int fpsMillihz = game.decoderRenderer.getStreamFrameRateMilliHz();
         if (fpsMillihz <= 0) fpsMillihz = game.streamFps * 1000;
@@ -899,7 +902,7 @@ final class GameVideoOutput {
         if (limits == null) {
             return null;
         }
-        int[] size = game.nativeResolutionStream ? nativeStreamSize(limits, windowLandscape, nativeResolution) :
+        int[] size = game.nativeResolutionStream && !game.fixedStreamSize ? nativeStreamSize(limits, windowLandscape, nativeResolution) :
                 StreamOrientation.followsRotation(game.streamOrientation, game.hostShapesStream) && !game.isInMultiWindowMode() ?
                 StreamOrientation.turnedSize(launchWidth, launchHeight, windowLandscape, limits[0], limits[1],
                         limits[2], limits[3]) : null;
@@ -1008,6 +1011,7 @@ final class GameVideoOutput {
         if (game.isFinishing() || game.isDestroyed() || (width == game.prefConfig.width && height == game.prefConfig.height)) {
             return;
         }
+        game.messages.alert(game.getString(R.string.stream_size_changed, width, height), Toast.LENGTH_LONG);
         LimeLog.info("Stream now " + width + "x" + height + " (was " + game.prefConfig.width + "x" + game.prefConfig.height + ")");
         game.prefConfig.width = width;
         game.prefConfig.height = height;

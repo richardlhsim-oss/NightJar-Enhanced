@@ -27,7 +27,7 @@ public final class DesktopGestures {
     private static final int TWO_UNDECIDED = 0, TWO_ZOOM = 1, TWO_SCROLL = 2;
     private static final int ONE_IDLE = 0, ONE_PRESS = 1, ONE_SECOND_PRESS = 2, ONE_PAN = 3, ONE_DRAG = 4;
     private static final float PINCH_SLOP_DP = 24, SCROLL_SLOP_DP = 10, TAP_SLOP_DP = 12, DOUBLE_TAP_SLOP_DP = 40;
-    private static final float SCROLL_SPEED = 3, PAN_SPEED = 2;
+    private static final float SCROLL_SPEED = 6, PAN_SPEED = 4;
     private static final int DOUBLE_TAP_MS = 350, DOUBLE_CLICK_WAIT_MS = 500, LONG_PRESS_MS = 650;
 
     private final DesktopViewport viewport = new DesktopViewport();
@@ -139,7 +139,7 @@ public final class DesktopGestures {
             apply();
         } else if (!direct && viewport.scale() > 1 || pointer == null) {
             // A trackpad's one finger moves the cursor, so a zoomed view still pans with two.
-            viewport.pan(x - lastX, y - lastY);
+            viewport.pan((x - lastX) * PAN_SPEED, (y - lastY) * PAN_SPEED);
             apply();
         } else {
             pointer.scroll((y - lastY) * SCROLL_SPEED, -(x - lastX) * SCROLL_SPEED);

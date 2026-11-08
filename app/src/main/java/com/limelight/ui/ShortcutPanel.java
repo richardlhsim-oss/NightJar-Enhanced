@@ -34,9 +34,11 @@ public final class ShortcutPanel {
         void toggleKeyboard();
         void setVoiceTyping(boolean on);
         void layoutChanged();
+        void modifiersHeld(boolean any);
     }
 
-    private static final int TILE_WIDTH_DP = 72, TILE_HEIGHT_DP = 36, GAP_DP = 2, ROWS = 3, SWIPE_DP = 24;
+    private static final int TILE_WIDTH_DP = 60, TILE_HEIGHT_DP = 30, GAP_DP = 2, ROWS = 2, SWIPE_DP = 24;
+    private static final int EXCLUSION_WIDTH_DP = 48, EXCLUSION_HEIGHT_DP = 200;
 
     private final Context context;
     private final Host host;
@@ -48,7 +50,7 @@ public final class ShortcutPanel {
     private final int barHeight;
     private final List<Integer> held = new ArrayList<>();
     private final List<MaterialButton> modifierButtons = new ArrayList<>();
-    private boolean open;
+    private boolean open, voiceOn;
 
     public ShortcutPanel(Activity activity, ViewGroup parent, View stream, boolean voiceTyping, Host host) {
         this.host = host;
@@ -98,12 +100,12 @@ public final class ShortcutPanel {
         addModifier(first, R.string.shortcut_key_shift, shift);
         tile(first, context.getString(R.string.shortcut_keyboard)).setOnClickListener(v -> host.toggleKeyboard());
         MaterialButton voice = tile(first, context.getString(R.string.shortcut_voice_typing));
-        voice.setCheckable(true);
-        voice.setChecked(voiceTyping);
-        paint(voice);
+        voiceOn = voiceTyping;
+        paint(voice, voiceOn);
         voice.setOnClickListener(v -> {
-            paint(voice);
-            host.setVoiceTyping(voice.isChecked());
+            voiceOn = !voiceOn;
+            paint(voice, voiceOn);
+            host.setVoiceTyping(voiceOn);
         });
         addChord(first, "Esc", KeyEvent.KEYCODE_ESCAPE);
         addChord(first, "Tab", KeyEvent.KEYCODE_TAB);
@@ -113,6 +115,17 @@ public final class ShortcutPanel {
         addChord(first, "End", KeyEvent.KEYCODE_MOVE_END);
 
         LinearLayout second = row();
+        addChord(second, "Alt+Tab", alt, KeyEvent.KEYCODE_TAB);
+        addChord(second, "Alt+F4", alt, KeyEvent.KEYCODE_F4);
+        addChord(second, "Start", win);
+        addChord(second, "Desktop", win, KeyEvent.KEYCODE_D);
+        addChord(second, "Explorer", win, KeyEvent.KEYCODE_E);
+        addChord(second, "Run", win, KeyEvent.KEYCODE_R);
+        addChord(second, "Task view", win, KeyEvent.KEYCODE_TAB);
+        addChord(second, "Snip", win, shift, KeyEvent.KEYCODE_S);
+        addChord(second, "Task Mgr", ctrl, shift, KeyEvent.KEYCODE_ESCAPE);
+        addChord(second, "Lock", win, KeyEvent.KEYCODE_L);
+        addChord(second, "Settings", win, KeyEvent.KEYCODE_I);
         addChord(second, "Copy", ctrl, KeyEvent.KEYCODE_C);
         addChord(second, "Paste", ctrl, KeyEvent.KEYCODE_V);
         addChord(second, "Cut", ctrl, KeyEvent.KEYCODE_X);
@@ -124,19 +137,6 @@ public final class ShortcutPanel {
         addChord(second, "New tab", ctrl, KeyEvent.KEYCODE_T);
         addChord(second, "Close tab", ctrl, KeyEvent.KEYCODE_W);
 
-        LinearLayout third = row();
-        addChord(third, "Alt+Tab", alt, KeyEvent.KEYCODE_TAB);
-        addChord(third, "Alt+F4", alt, KeyEvent.KEYCODE_F4);
-        addChord(third, "Start", win);
-        addChord(third, "Desktop", win, KeyEvent.KEYCODE_D);
-        addChord(third, "Explorer", win, KeyEvent.KEYCODE_E);
-        addChord(third, "Run", win, KeyEvent.KEYCODE_R);
-        addChord(third, "Task view", win, KeyEvent.KEYCODE_TAB);
-        addChord(third, "Snip", win, shift, KeyEvent.KEYCODE_S);
-        addChord(third, "Task Mgr", ctrl, shift, KeyEvent.KEYCODE_ESCAPE);
-        addChord(third, "Lock", win, KeyEvent.KEYCODE_L);
-        addChord(third, "Settings", win, KeyEvent.KEYCODE_I);
-
         HorizontalScrollView scroll = new HorizontalScrollView(context);
         scroll.setFillViewport(true);
         scroll.setHorizontalScrollBarEnabled(false);
@@ -144,6 +144,12 @@ public final class ShortcutPanel {
         panel.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, barHeight));
 
         parent.addView(panel, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, barHeight, Gravity.BOTTOM));
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            // Android keeps this edge for Back unless excluded; the bottom edge cannot be claimed at all.
+            parent.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> parent.setSystemGestureExclusionRects(
+                    Collections.singletonList(new android.graphics.Rect(0, Math.max(0, b - t - Math.round(EXCLUSION_HEIGHT_DP * density)),
+                            Math.round(EXCLUSION_WIDTH_DP * density), b - t))));
+        }
         ViewCompat.setOnApplyWindowInsetsListener(panel, (view, insets) -> {
             androidx.core.graphics.Insets cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout());
             view.setPadding(cutout.left, 0, cutout.right, 0);
@@ -182,13 +188,14 @@ public final class ShortcutPanel {
         return button;
     }
 
-    private void paint(MaterialButton button) {
-        if (button.isChecked()) {
+    // A MaterialButton drops its checked state once it has a custom background, so state lives here.
+    private void paint(MaterialButton button, boolean on) {
+        if (on) {
             GradientDrawable fill = new GradientDrawable();
             fill.setCornerRadius(context.getResources().getDimension(R.dimen.nj_radius_control));
-            fill.setColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryContainer, 0));
+            fill.setColor(MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, 0));
             button.setBackground(fill);
-            button.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimaryContainer, 0));
+            button.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0));
         } else {
             button.setBackground(new GlassControlDrawable(context, GlassControlDrawable.Kind.ROW,
                     context.getResources().getDimension(R.dimen.nj_radius_control)));
@@ -199,12 +206,13 @@ public final class ShortcutPanel {
     // Stays down until tapped again or the bar hides.
     private void addModifier(LinearLayout row, int label, int keyCode) {
         MaterialButton button = tile(row, context.getString(label));
-        button.setCheckable(true);
         button.setTag(keyCode);
         button.setOnClickListener(v -> {
-            paint(button);
-            if (button.isChecked()) held.add(keyCode); else held.remove(Integer.valueOf(keyCode));
-            host.key(keyCode, button.isChecked());
+            boolean on = !held.contains(keyCode);
+            paint(button, on);
+            if (on) held.add(keyCode); else held.remove(Integer.valueOf(keyCode));
+            host.key(keyCode, on);
+            host.modifiersHeld(!held.isEmpty());
         });
         modifierButtons.add(button);
     }
@@ -253,12 +261,13 @@ public final class ShortcutPanel {
         panel.setTranslationY(0);
         applyLayout();
         for (MaterialButton button : modifierButtons) {
-            if (!button.isChecked()) continue;
-            button.setChecked(false);
-            paint(button);
-            host.key((Integer) button.getTag(), false);
+            int key = (Integer) button.getTag();
+            if (!held.contains(key)) continue;
+            paint(button, false);
+            host.key(key, false);
         }
         held.clear();
+        host.modifiersHeld(false);
     }
 
     /** The bar sits on top of the soft keyboard. */

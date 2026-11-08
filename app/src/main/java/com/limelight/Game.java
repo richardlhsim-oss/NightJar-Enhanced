@@ -307,6 +307,8 @@ public class Game extends Activity implements SurfaceHolder.Callback, TextureVie
     // Mid-stream reconfigure (0x5532): a stream at the phone's native resolution, or at the
     // panel's top refresh rate, follows fold, window and panel changes without reconnecting.
     boolean nativeResolutionStream;
+    // A size chosen in settings: the host is never asked to change it to the panel's.
+    boolean fixedStreamSize;
     boolean fpsFollowsDisplay;
     int streamFps;
     // The size the decoder was set up for (the negotiated one) or a reconfigure changed it to; 0 until then.

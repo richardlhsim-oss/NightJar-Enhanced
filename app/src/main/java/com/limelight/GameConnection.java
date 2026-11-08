@@ -176,6 +176,7 @@ final class GameConnection {
         // Fixed presets keep their size; anything else is the phone's own resolution and follows it.
         game.nativeResolutionStream = game.prefConfig.resolutionFollowsScreen ||
                 PreferenceConfiguration.isNativeResolution(game.prefConfig.width, game.prefConfig.height);
+        game.fixedStreamSize = !game.prefConfig.resolutionFollowsScreen;
         game.fpsFollowsDisplay = com.limelight.binding.video.DisplayFrameRatePolicy.fpsFollowsDisplay(game.prefConfig.vrr,
                 game.prefConfig.fps, com.limelight.binding.video.DisplayFrameRatePolicy.maxRefreshRate(
                         game.videoOutput.getVideoDisplay()));
@@ -583,6 +584,10 @@ final class GameConnection {
                     @Override public void setVoiceTyping(boolean on) {
                         enhancedPrefs.edit().putBoolean(VOICE_TYPING_PREF, on).apply();
                         game.streamView.setVoiceTyping(on);
+                    }
+                    // A held modifier needs real key presses, which a text field's keyboard does not send.
+                    @Override public void modifiersHeld(boolean any) {
+                        game.streamView.setVoiceTyping(!any && enhancedPrefs.getBoolean(VOICE_TYPING_PREF, true));
                     }
                     @Override public void layoutChanged() {
                         game.keyboardPanHandler.removeCallbacks(game.keyboardPan);
