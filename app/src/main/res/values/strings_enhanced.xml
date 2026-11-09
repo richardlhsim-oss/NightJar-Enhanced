@@ -13,4 +13,6 @@
     <string name="shortcut_voice_typing" translatable="false">Voice typing</string>
     <string name="stream_size_check" translatable="false">NightJar Enhanced %1$s: asked for %2$d×%3$d, receiving %4$d×%5$d</string>
     <string name="stream_size_changed" translatable="false">Stream changed to %1$d×%2$d</string>
+    <string name="stream_pc_audio_on" translatable="false">Play audio on PC</string>
+    <string name="stream_pc_audio_off" translatable="false">Stop audio on PC</string>
 </resources>

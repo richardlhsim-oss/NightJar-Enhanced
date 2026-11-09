@@ -304,6 +304,7 @@ final class GameMenuActions {
         options.headphoneSurroundOffered = game.conn.offersHostAudio(com.limelight.nativeapi.NativeCapabilities.HEADPHONE_SURROUND);
         options.hostAudio = hostAudio;
         options.hostAudioUnread = hostAudioUnread;
+        options.pcAudioOn = game.prefConfig.playHostAudio;
         options.micButtonAvailable = game.micButton != null;
         options.micButtonShown = game.micButton != null && game.prefConfig.micButton;
         options.menuButtonAvailable = game.menuButton != null;
@@ -372,6 +373,11 @@ final class GameMenuActions {
             case MENU_BUTTON: action = () -> game.touchInput.setMenuButtonShown(!game.prefConfig.floatingMenuButton); break;
             case GAME_CONTROLS: action = game.gameTouchControls == null ? null : game.gameTouchControls::showMenu; break;
             case KEYBOARD_KEYS: action = game.keyboardInput::toggleKeyboardOverlay; break;
+            case PC_AUDIO: action = () -> {
+                android.preference.PreferenceManager.getDefaultSharedPreferences(game).edit().putBoolean(
+                        com.limelight.preferences.PreferenceConfiguration.HOST_AUDIO_PREF_STRING, !game.prefConfig.playHostAudio).commit();
+                game.streamRecovery.reconnectStream(false, true);
+            }; break;
             case VIDEO_SCALING: action = game.videoOutput::showVideoScalingDialog; break;
             case ZOOM: action = game.videoOutput::toggleDesktopZoom; break;
             case ZOOM_RESET: action = () -> {

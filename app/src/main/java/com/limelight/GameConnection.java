@@ -80,6 +80,7 @@ import java.security.cert.X509Certificate;
 /** The stream's connection: starting it on the video surface, the connection's stages and status, its messages and launch confirmations, losing and regaining the network, and stopping it. */
 final class GameConnection {
     private static final String VOICE_TYPING_PREF = "enhanced_voice_typing";
+    private static final String MIC_ASKED_PREF = "enhanced_mic_asked";
 
     private final Game game;
 
@@ -719,6 +720,15 @@ final class GameConnection {
         game.clipboardSync = com.limelight.utils.ClipboardSync.forStream(game,
                 text -> game.messages.alert(text, Toast.LENGTH_LONG));
         game.clipboardSync.connectionStarted(game.hasWindowFocus());
+    }
+
+    // The microphone is on by default, so the settings switch that would ask may never be touched. Asked once.
+    private void askForMicrophone() {
+        android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(game);
+        if (!game.prefConfig.enableMic || Build.VERSION.SDK_INT < Build.VERSION_CODES.M || prefs.getBoolean(MIC_ASKED_PREF, false) ||
+                game.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) return;
+        prefs.edit().putBoolean(MIC_ASKED_PREF, true).apply();
+        game.requestPermissions(new String[] {android.Manifest.permission.RECORD_AUDIO}, Game.MIC_PERMISSION_REQUEST);
     }
 
     private volatile Boolean androidTv;
@@ -1395,6 +1405,7 @@ final class GameConnection {
                 requestLinkNotice();
                 game.keyboardInput.requestTextInput();
                 startClipboardSync();
+                askForMicrophone();
                 game.touchInput.updateHostCursorShapes();
                 if (!game.conn.canSendInput()) {
                     if (game.gameTouchControls != null) game.gameTouchControls.hideForPip(true);

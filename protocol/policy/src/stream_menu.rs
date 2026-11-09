@@ -121,6 +121,7 @@ pub const TILES: &[Tile] = &[
     more("menu_button"),
     more("game_controls"),
     more("picture"),
+    more("pc_audio"),
     more("video_scaling"),
     more("zoom_reset"),
     more("picture_in_picture"),

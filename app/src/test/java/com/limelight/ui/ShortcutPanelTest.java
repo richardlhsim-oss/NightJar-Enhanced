@@ -55,7 +55,9 @@ public class ShortcutPanelTest {
                 @Override public void modifiersHeld(boolean any) { anyHeld = any; }
             });
             panel.open();
-            assertEquals(panel.height(), ((FrameLayout.LayoutParams) stream.getLayoutParams()).bottomMargin);
+            FrameLayout.LayoutParams margins = (FrameLayout.LayoutParams) stream.getLayoutParams();
+            assertEquals("the space above the bar", panel.height(), margins.topMargin + margins.bottomMargin);
+            assertEquals("centred in that space", panel.height() / 2, margins.bottomMargin - margins.topMargin, 1);
 
             MaterialButton ctrl = find(parent, activity.getString(R.string.shortcut_key_ctrl));
             ctrl.performClick();

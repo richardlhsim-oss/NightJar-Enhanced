@@ -68,7 +68,7 @@ public class PreferenceConfiguration {
     private static final String STRETCH_PREF_STRING = VideoScaling.STRETCH_PREF;
     private static final String SOPS_PREF_STRING = "checkbox_enable_sops";
     private static final String DISABLE_TOASTS_PREF_STRING = "checkbox_disable_warnings";
-    private static final String HOST_AUDIO_PREF_STRING = "checkbox_host_audio";
+    public static final String HOST_AUDIO_PREF_STRING = "checkbox_host_audio";
     public static final String ENABLE_MIC_PREF_STRING = "checkbox_enable_mic";
     static final String MIC_ECHO_PREF_STRING = "list_mic_echo_cancel";
     // No row shows it: debug builds set it for echo measurements (EchoProbeActivity).
@@ -219,7 +219,7 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_SOPS = true;
     private static final boolean DEFAULT_DISABLE_TOASTS = false;
     private static final boolean DEFAULT_HOST_AUDIO = false;
-    private static final boolean DEFAULT_ENABLE_MIC = false;
+    private static final boolean DEFAULT_ENABLE_MIC = true;
     private static final int DEFAULT_DEADZONE = 7;
     private static final int DEFAULT_OPACITY = 90;
     public static final String DEFAULT_LANGUAGE = "default";

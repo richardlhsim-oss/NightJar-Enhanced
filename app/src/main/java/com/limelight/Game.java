@@ -369,6 +369,7 @@ public class Game extends Activity implements SurfaceHolder.Callback, TextureVie
     com.limelight.ui.StreamPresentation externalPresentation;
     com.limelight.ui.DesktopGestures desktopGestures;
     com.limelight.ui.ShortcutPanel shortcutPanel;
+    static final int MIC_PERMISSION_REQUEST = 7301;
     com.limelight.ui.GameTouchControls gameTouchControls;
     boolean outputSwitchPending;
     Surface videoSurface;
@@ -1309,7 +1310,16 @@ public class Game extends Activity implements SurfaceHolder.Callback, TextureVie
         return keyboardInput.handleTextInput(text);
     }
 
+    // The microphone opens with a connection, so the stream joins again to use it.
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MIC_PERMISSION_REQUEST && grantResults.length > 0 &&
+                grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED && connected) {
+            streamRecovery.reconnectStream(false, true);
+        }
+    }
+
     public void toggleKeyboard() {
         keyboardInput.toggleKeyboard();
     }

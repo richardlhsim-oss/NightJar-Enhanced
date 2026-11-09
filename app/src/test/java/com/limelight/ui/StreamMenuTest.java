@@ -134,7 +134,7 @@ public class StreamMenuTest {
                 StreamMenu.Section.DISPLAY, StreamMenu.Section.QUALITY, StreamMenu.Section.HOST), new ArrayList<>(menu.keySet()));
         assertEquals(Arrays.asList(KEYBOARD, PC_KEYBOARD, OVERLAY), menu.get(StreamMenu.Section.QUICK));
         assertEquals(Arrays.asList(TOUCH_MODE, ONSCREEN_CONTROLS, KEYBOARD_KEYS), menu.get(StreamMenu.Section.INPUT));
-        assertEquals(Arrays.asList(ZOOM, OVERLAY_PAGE), menu.get(StreamMenu.Section.DISPLAY));
+        assertEquals(Arrays.asList(PC_AUDIO, ZOOM, OVERLAY_PAGE), menu.get(StreamMenu.Section.DISPLAY));
         // Resolution and frame rate (automatic quality) are Quality, not "Bitrate".
         assertEquals(Arrays.asList(BITRATE, AUTOMATIC_QUALITY, AUTOMATIC_BITRATE), menu.get(StreamMenu.Section.QUALITY));
         assertEquals(Arrays.asList(SERVER_COMMANDS, CLIPBOARD_SEND, CLIPBOARD_RECEIVE, HOST_WEB_UI, HOST_STATUS),
@@ -464,13 +464,13 @@ public class StreamMenuTest {
         Map<StreamMenu.Section, List<StreamMenu.Item>> menu = sections(StreamMenu.mainPage(options));
         assertEquals(Arrays.asList(TOUCH_MODE, MOUSE_CURSOR, ONSCREEN_CONTROLS, CONTROLS_LAYOUT, GAME_CONTROLS, KEYBOARD_KEYS),
                 menu.get(StreamMenu.Section.INPUT));
-        assertEquals(Arrays.asList(VIDEO_SCALING, ZOOM, ZOOM_RESET, OVERLAY_PAGE, PICTURE_IN_PICTURE, VIDEO_OUTPUT),
+        assertEquals(Arrays.asList(PC_AUDIO, VIDEO_SCALING, ZOOM, ZOOM_RESET, OVERLAY_PAGE, PICTURE_IN_PICTURE, VIDEO_OUTPUT),
                 menu.get(StreamMenu.Section.DISPLAY));
         // Video on an external display: this device is a touchpad, so its own display items go.
         options.localOutput = false;
         menu = sections(StreamMenu.mainPage(options));
         assertFalse(menu.get(StreamMenu.Section.INPUT).contains(TOUCH_MODE));
-        assertEquals(Arrays.asList(OVERLAY_PAGE, VIDEO_OUTPUT), menu.get(StreamMenu.Section.DISPLAY));
+        assertEquals(Arrays.asList(PC_AUDIO, OVERLAY_PAGE, VIDEO_OUTPUT), menu.get(StreamMenu.Section.DISPLAY));
     }
 
     @Test

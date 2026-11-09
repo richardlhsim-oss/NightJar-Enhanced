@@ -147,9 +147,10 @@ public final class ShortcutPanel {
         parent.addView(panel, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, barHeight, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             // Android keeps this edge for Back unless excluded; the bottom edge cannot be claimed at all.
-            parent.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> parent.setSystemGestureExclusionRects(
-                    Collections.singletonList(new android.graphics.Rect(0, Math.max(0, b - t - Math.round(EXCLUSION_HEIGHT_DP * density)),
-                            Math.round(EXCLUSION_WIDTH_DP * density), b - t))));
+            int edgeWidth = Math.round(EXCLUSION_WIDTH_DP * density), edgeHeight = Math.round(EXCLUSION_HEIGHT_DP * density);
+            parent.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> parent.setSystemGestureExclusionRects(java.util.Arrays.asList(
+                    new android.graphics.Rect(0, Math.max(0, b - t - edgeHeight), edgeWidth, b - t),
+                    new android.graphics.Rect(r - l - edgeWidth, 0, r - l, edgeHeight))));
         }
         ViewCompat.setOnApplyWindowInsetsListener(panel, (view, insets) -> {
             androidx.core.graphics.Insets cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout());
@@ -283,8 +284,13 @@ public final class ShortcutPanel {
     }
 
     private void applyLayout() {
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) stream.getLayoutParams();
-        params.bottomMargin = height();
+        // FrameLayout centres a child at (space - height) / 2 + top - bottom, and takes both margins from its
+        // height. A quarter above and the rest below gives the space above the bar and centres in it; the bar's
+        // whole height below alone would lift the picture half a bar past the top of the screen.
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) stream.getLayoutParams();
+        boolean top = (params.gravity & Gravity.VERTICAL_GRAVITY_MASK) == Gravity.TOP;
+        params.topMargin = top ? 0 : height() / 4;
+        params.bottomMargin = height() - params.topMargin;
         stream.setLayoutParams(params);
         host.layoutChanged();
     }

@@ -39,7 +39,7 @@ public final class StreamMenu {
     public enum Item {
         KEYBOARD, PC_KEYBOARD, OVERLAY, MICROPHONE, NIGHT_MODE, HEADPHONE_SURROUND,
         TOUCH_MODE, MOUSE_CURSOR, CONTROLLER_MOUSE, ONSCREEN_CONTROLS, CONTROLS_LAYOUT, MIC_BUTTON, MENU_BUTTON, GAME_CONTROLS, KEYBOARD_KEYS,
-        VIDEO_SCALING, ZOOM, ZOOM_RESET, OVERLAY_PAGE, PICTURE_IN_PICTURE, VIDEO_OUTPUT,
+        PC_AUDIO, VIDEO_SCALING, ZOOM, ZOOM_RESET, OVERLAY_PAGE, PICTURE_IN_PICTURE, VIDEO_OUTPUT,
         BITRATE, RATE_CHANGE, AUTOMATIC_QUALITY, AUTOMATIC_BITRATE,
         HOST_MENU, SERVER_COMMANDS, CLIPBOARD_SEND, CLIPBOARD_RECEIVE, IMAGE_CLIPBOARD_SEND, IMAGE_CLIPBOARD_RECEIVE,
         USB_DEVICES, FILES, HOST_WEB_UI, HOST_STATUS,
@@ -82,6 +82,8 @@ public final class StreamMenu {
         public boolean microphoneOffered, microphoneMuted;
         /** The stream has a microphone button (not on a remote monitor), and whether it shows (its setting is on). */
         public boolean micButtonAvailable, micButtonShown;
+        /** Whether the host also plays this stream's audio; changing it joins the stream again. */
+        public boolean pcAudioOn;
         /** The stream has a floating menu button, and whether it shows (its setting is on). */
         public boolean menuButtonAvailable, menuButtonShown;
         /** The stream's size, frame rate, Moonlight video format bits and HDR, for the header's mode line; 0 while unknown. */
@@ -239,6 +241,7 @@ public final class StreamMenu {
         }
 
         if (o.mediaStream()) {
+            entries.add(action(Section.DISPLAY, Item.PC_AUDIO, o.pcAudioOn ? R.string.stream_pc_audio_off : R.string.stream_pc_audio_on, R.drawable.ic_speaker));
             if (o.scalingAvailable && o.localOutput) {
                 entries.add(action(Section.DISPLAY, Item.VIDEO_SCALING, R.string.video_scaling_title, R.drawable.ic_stretch));
             }
