@@ -94,6 +94,8 @@ final class GameTouchInput {
     private boolean edgeDownRight, edgeDownTop;
     // Each corner zone: this share of the screen's width in from its side, and of its height from its top or bottom.
     private static final float EDGE_ZONE_WIDTH_SHARE = 0.1f, EDGE_ZONE_HEIGHT_SHARE = 0.3f;
+    // The top-right zone, which shows the keyboard, is taller.
+    private static final float TOP_RIGHT_ZONE_HEIGHT_SHARE = 0.45f;
     private MotionEvent edgeDown;
     private boolean panelSwallowsGesture;
 
@@ -1312,9 +1314,9 @@ final class GameTouchInput {
             int[] at = new int[2];
             parent.getLocationOnScreen(at);
             float x = event.getRawX() - at[0], y = event.getRawY() - at[1];
-            boolean top = y < parent.getHeight() * EDGE_ZONE_HEIGHT_SHARE;
-            boolean bottom = y > parent.getHeight() * (1 - EDGE_ZONE_HEIGHT_SHARE);
             edgeDownRight = x > parent.getWidth() * (1 - EDGE_ZONE_WIDTH_SHARE);
+            boolean top = y < parent.getHeight() * (edgeDownRight ? TOP_RIGHT_ZONE_HEIGHT_SHARE : EDGE_ZONE_HEIGHT_SHARE);
+            boolean bottom = y > parent.getHeight() * (1 - EDGE_ZONE_HEIGHT_SHARE);
             boolean left = x < parent.getWidth() * EDGE_ZONE_WIDTH_SHARE;
             edgeDownTop = top;
             // The middle of each side stays the system's: its Back gesture there opens the stream menu.
