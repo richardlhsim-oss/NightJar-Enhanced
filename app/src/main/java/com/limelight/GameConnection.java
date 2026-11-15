@@ -79,7 +79,6 @@ import java.security.cert.X509Certificate;
 
 /** The stream's connection: starting it on the video surface, the connection's stages and status, its messages and launch confirmations, losing and regaining the network, and stopping it. */
 final class GameConnection {
-    private static final String VOICE_TYPING_PREF = "enhanced_voice_typing";
     private static final String MIC_ASKED_PREF = "enhanced_mic_asked";
 
     private final Game game;
@@ -581,19 +580,15 @@ final class GameConnection {
         android.content.SharedPreferences enhancedPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(game);
         game.desktopGestures.setEnabled(enhancedPrefs.getBoolean(com.limelight.GameVideoOutput.ZOOM_PREF, true) &&
                 (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || game.prefConfig.useTextureView));
-        boolean voiceTyping = enhancedPrefs.getBoolean(VOICE_TYPING_PREF, true);
-        game.streamView.setVoiceTyping(voiceTyping);
-        game.shortcutPanel = new com.limelight.ui.ShortcutPanel(game, (android.view.ViewGroup) game.streamView.getParent(), game.streamView, voiceTyping,
+        // Always on: the keyboard's voice and swipe typing need a text field to edit.
+        game.streamView.setVoiceTyping(true);
+        game.shortcutPanel = new com.limelight.ui.ShortcutPanel(game, (android.view.ViewGroup) game.streamView.getParent(), game.streamView,
                 new com.limelight.ui.ShortcutPanel.Host() {
                     @Override public void key(int keyCode, boolean down) { game.keyboardInput.sendCustomKey(keyCode, down); }
                     @Override public void toggleKeyboard() { game.toggleKeyboard(); }
-                    @Override public void setVoiceTyping(boolean on) {
-                        enhancedPrefs.edit().putBoolean(VOICE_TYPING_PREF, on).apply();
-                        game.streamView.setVoiceTyping(on);
-                    }
                     // A held modifier needs real key presses, which a text field's keyboard does not send.
                     @Override public void modifiersHeld(boolean any) {
-                        game.streamView.setVoiceTyping(!any && enhancedPrefs.getBoolean(VOICE_TYPING_PREF, true));
+                        game.streamView.setVoiceTyping(!any);
                     }
                     @Override public void layoutChanged() {
                         game.keyboardPanHandler.removeCallbacks(game.keyboardPan);

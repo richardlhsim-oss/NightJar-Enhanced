@@ -31,7 +31,6 @@ public final class ShortcutPanel {
     public interface Host {
         void key(int keyCode, boolean down);
         void toggleKeyboard();
-        void setVoiceTyping(boolean on);
         void layoutChanged();
         void modifiersHeld(boolean any);
     }
@@ -49,10 +48,10 @@ public final class ShortcutPanel {
     private final int barHeight;
     private final List<Integer> held = new ArrayList<>();
     private final List<TileGrid.Tile> modifierButtons = new ArrayList<>();
-    private boolean open, voiceOn;
+    private boolean open;
     private int keyboardInset;
 
-    public ShortcutPanel(Activity activity, ViewGroup parent, View stream, boolean voiceTyping, Host host) {
+    public ShortcutPanel(Activity activity, ViewGroup parent, View stream, Host host) {
         this.host = host;
         this.parent = parent;
         this.stream = stream;
@@ -100,14 +99,6 @@ public final class ShortcutPanel {
         addModifier(first, d, R.string.shortcut_key_alt, alt);
         addModifier(first, d, R.string.shortcut_key_shift, shift);
         tile(first, R.drawable.ic_keyboard, context.getString(R.string.shortcut_keyboard)).setOnClickListener(v -> host.toggleKeyboard());
-        TileGrid.Tile voice = tile(first, R.drawable.ic_mic, context.getString(R.string.shortcut_voice_typing));
-        voiceOn = voiceTyping;
-        voice.setOn(voiceOn);
-        voice.setOnClickListener(v -> {
-            voiceOn = !voiceOn;
-            voice.setOn(voiceOn);
-            host.setVoiceTyping(voiceOn);
-        });
         addChord(first, d, "Esc", KeyEvent.KEYCODE_ESCAPE);
         addChord(first, d, "Tab", KeyEvent.KEYCODE_TAB);
         addChord(first, R.drawable.ic_glass_right, "Enter", KeyEvent.KEYCODE_ENTER);

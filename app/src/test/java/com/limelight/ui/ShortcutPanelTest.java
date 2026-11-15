@@ -47,10 +47,9 @@ public class ShortcutPanelTest {
             FrameLayout parent = new FrameLayout(activity);
             View stream = new View(activity);
             parent.addView(stream, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-            ShortcutPanel panel = new ShortcutPanel(activity, parent, stream, true, new ShortcutPanel.Host() {
+            ShortcutPanel panel = new ShortcutPanel(activity, parent, stream, new ShortcutPanel.Host() {
                 @Override public void key(int keyCode, boolean down) { keys.add(keyCode + (down ? " down" : " up")); }
                 @Override public void toggleKeyboard() { }
-                @Override public void setVoiceTyping(boolean on) { }
                 @Override public void layoutChanged() { }
                 @Override public void modifiersHeld(boolean any) { anyHeld = any; }
             });
