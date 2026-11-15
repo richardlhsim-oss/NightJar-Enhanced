@@ -247,7 +247,7 @@ public class SettingsKeysTest {
         reads.put("list_fps", new Read("30", "60", c -> c.fps));
         reads.put("seekbar_bitrate_kbps", new Read(10000, 45500, c -> c.bitrate));
         reads.put("list_mobile_bitrate_kbps", new Read("0", "10000", c -> c.mobileBitrateLimit));
-        reads.put("seekbar_remote_bitrate_kbps", new Read(500, 3000, c -> c.remoteBitrate));
+        reads.put("seekbar_remote_bitrate_kbps", new Read(1000, 3000, c -> c.remoteBitrate));
         reads.put("video_format", new Read("auto", "neverh265", c -> c.videoFormat));
         reads.put("adaptive_quality_mode", new Read("off", "motion", c -> c.adaptiveQualityMode));
         reads.put("adaptive_quality_min_resolution", new Read("720", "360", c -> c.qualityMinShortEdge));

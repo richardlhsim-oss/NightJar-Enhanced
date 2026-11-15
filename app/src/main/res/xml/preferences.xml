@@ -97,7 +97,7 @@
             seekbar:keyStep="1000"
             seekbar:divisor="1000"
             seekbar:logScale="true"
-            android:defaultValue="500"
+            android:defaultValue="1000"
             android:text="@string/suffix_seekbar_bitrate_mbps"
             android:title="@string/title_remote_bitrate" />
         <com.limelight.preferences.MaterialListPreference

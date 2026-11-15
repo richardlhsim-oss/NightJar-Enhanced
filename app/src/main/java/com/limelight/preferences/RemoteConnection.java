@@ -8,13 +8,14 @@ import java.util.regex.Pattern;
 
 /**
  * A stream to a PC outside this network (the internet, a VPN such as Tailscale) uses its own bitrate, which starts at
- * the lowest the bitrate setting allows. Only the address the stream uses decides: a private, link-local or loopback
+ * 1 Mbps. Only the address the stream uses decides: a private, link-local or loopback
  * address, a .local name or a bare host name is this network; any other address or name is remote. Names are never
  * looked up, so this costs nothing at launch.
  */
 public final class RemoteConnection {
     public static final String BITRATE_PREF = "seekbar_remote_bitrate_kbps";
-    public static final int DEFAULT_BITRATE_KBPS = 500;
+    public static final int DEFAULT_BITRATE_KBPS = 1000;
+    private static final int MIN_BITRATE_KBPS = 500;
     private static final Pattern IPV4 = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3}");
 
     private RemoteConnection() { }
@@ -40,6 +41,6 @@ public final class RemoteConnection {
     }
 
     public static int bitrateKbps(SharedPreferences prefs) {
-        return Math.max(DEFAULT_BITRATE_KBPS, prefs.getInt(BITRATE_PREF, DEFAULT_BITRATE_KBPS));
+        return Math.max(MIN_BITRATE_KBPS, prefs.getInt(BITRATE_PREF, DEFAULT_BITRATE_KBPS));
     }
 }

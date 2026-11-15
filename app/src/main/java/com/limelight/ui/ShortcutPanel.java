@@ -147,10 +147,13 @@ public final class ShortcutPanel {
         parent.addView(panel, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, barHeight, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             // Android keeps this edge for Back unless excluded; the bottom edge cannot be claimed at all.
-            int edgeWidth = Math.round(EXCLUSION_WIDTH_DP * density), edgeHeight = Math.round(EXCLUSION_HEIGHT_DP * density);
+            // Android grants 200 dp of each side: half at each corner, for the corner swipes. The middle keeps Back.
+            int edgeWidth = Math.round(EXCLUSION_WIDTH_DP * density), edgeHeight = Math.round(EXCLUSION_HEIGHT_DP * density) / 2;
             parent.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> parent.setSystemGestureExclusionRects(java.util.Arrays.asList(
+                    new android.graphics.Rect(0, 0, edgeWidth, edgeHeight),
                     new android.graphics.Rect(0, Math.max(0, b - t - edgeHeight), edgeWidth, b - t),
-                    new android.graphics.Rect(r - l - edgeWidth, 0, r - l, edgeHeight))));
+                    new android.graphics.Rect(r - l - edgeWidth, 0, r - l, edgeHeight),
+                    new android.graphics.Rect(r - l - edgeWidth, Math.max(0, b - t - edgeHeight), r - l, b - t))));
         }
         ViewCompat.setOnApplyWindowInsetsListener(panel, (view, insets) -> {
             androidx.core.graphics.Insets cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout());

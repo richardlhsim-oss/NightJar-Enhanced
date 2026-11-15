@@ -139,8 +139,8 @@ public class GameRecoveryTest {
             connection.setMicrophoneMuted(false);
             assertRestoredMute(ReflectionHelpers.callInstanceMethod(game.streamRecovery, "createReconnectIntent"), false);
         }
-        // A separate fresh launch still uses the unmuted default; the choice belongs to this session.
-        assertRestoredMute(new Intent(), false);
+        // A separate fresh launch starts muted; the choice belongs to this session.
+        assertRestoredMute(new Intent(), true);
     }
 
     @Test public void manualReconnectKeepsTheMuteSnapshotWhenTheStoppedConnectionIsGone() throws Exception {
@@ -191,7 +191,7 @@ public class GameRecoveryTest {
 
     private static void assertRestoredMute(Intent retry, boolean muted) {
         assertNotNull(retry);
-        assertEquals(muted, retry.getBooleanExtra(MICROPHONE_MUTED, false));
+        assertEquals(muted, retry.getBooleanExtra(MICROPHONE_MUTED, true));
         Game replacement = Robolectric.buildActivity(Game.class).get();
         replacement.setIntent(retry);
         MuteConnection connection = new MuteConnection();

@@ -246,7 +246,7 @@ final class GameKeyboardInput {
     // Whether a host text field may open the soft keyboard, whose it is, and how far the stream
     // moves up for it.
     private final HostKeyboard hostKeyboard = new HostKeyboard();
-    private static final long BRIEF_KEYBOARD_MS = 3000;
+    private static final long BRIEF_KEYBOARD_MS = 5000;
     private long lastTypedAt;
     private boolean briefKeyboard;
     private final Runnable briefKeyboardCheck = this::checkBriefKeyboard;

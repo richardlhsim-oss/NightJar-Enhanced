@@ -57,8 +57,9 @@ final class GameRecovery {
     }
 
     void restoreMicrophoneMute() {
-        // This is session state, applied before controller binding or native capture can start.
-        game.conn.setMicrophoneMuted(game.getIntent().getBooleanExtra(Game.EXTRA_MICROPHONE_MUTED, false));
+        // This is session state, applied before controller binding or native capture can start. A new stream starts
+        // muted, which also leaves the microphone free for the keyboard's voice typing.
+        game.conn.setMicrophoneMuted(game.getIntent().getBooleanExtra(Game.EXTRA_MICROPHONE_MUTED, true));
     }
 
     /** The stream started again, {@code why} (a {@link LaunchSource}); the log keeps the start that opened it. */
@@ -173,7 +174,7 @@ final class GameRecovery {
         game.displayedFailureDialog = true;
         game.touchInput.setInputGrabState(false);
         game.streamConnection.stopConnection();
-        retry.putExtra(Game.EXTRA_MICROPHONE_MUTED, game.getIntent().getBooleanExtra(Game.EXTRA_MICROPHONE_MUTED, false));
+        retry.putExtra(Game.EXTRA_MICROPHONE_MUTED, game.getIntent().getBooleanExtra(Game.EXTRA_MICROPHONE_MUTED, true));
         final Thread stopping = game.connectionStopThread;
         final int generation = game.foregroundGeneration;
         final int recovery = recoveryGeneration;
@@ -448,7 +449,7 @@ final class GameRecovery {
         game.spinner = game.streamConnection.showConnecting(tripResume ?
                 game.getString(R.string.stream_reconnecting) :
                 game.getString(R.string.stream_recovery_attempt, game.recoveryPolicy.attempts(), StreamRecoveryPolicy.MAX_ATTEMPTS));
-        retry.putExtra(Game.EXTRA_MICROPHONE_MUTED, game.getIntent().getBooleanExtra(Game.EXTRA_MICROPHONE_MUTED, false));
+        retry.putExtra(Game.EXTRA_MICROPHONE_MUTED, game.getIntent().getBooleanExtra(Game.EXTRA_MICROPHONE_MUTED, true));
         pendingRecoveryIntent = retry;
         final int generation = game.foregroundGeneration;
         final int recovery = recoveryGeneration;
