@@ -89,11 +89,11 @@ final class GameTouchInput {
     private float lastAbsTouchUpX, lastAbsTouchUpY;
     private float lastAbsTouchDownX, lastAbsTouchDownY;
 
-    private static final float PANEL_EDGE_DP = 32, PANEL_SWIPE_DP = 40;
+    private static final float PANEL_SWIPE_DP = 40;
     private static final int CLICK_HOLD_MS = 40, CLICK_GAP_MS = 60;
     // The top-right part of the screen, as a share of its width and of its height.
     private static final float KEYBOARD_ZONE_SHARE = 0.3f;
-    private boolean edgeDownTopRight;
+    private boolean edgeDownTopRight, edgeDownTopLeft;
     private MotionEvent edgeDown;
     private boolean panelSwallowsGesture;
 
@@ -1293,7 +1293,7 @@ final class GameTouchInput {
     }
 
     /**
-     * A finger landing on the left edge waits here until it swipes right, which shows or hides the bar; one in the
+     * A finger landing in the top-left corner waits here until it swipes right, which shows or hides the PC keyboard; one in the bottom-left corner the same for the bar; one in the
      * top-right corner until it swipes left, which shows or hides the keyboard, or down, which shows it until a few
      * seconds pass without typing;
      * anything else then reaches the stream from its first event.
@@ -1311,7 +1311,10 @@ final class GameTouchInput {
             View parent = (View) game.streamView.getParent();
             int[] at = new int[2];
             parent.getLocationOnScreen(at);
-            boolean left = event.getRawX() - at[0] < PANEL_EDGE_DP * density;
+            float x = event.getRawX() - at[0], y = event.getRawY() - at[1];
+            boolean left = x < parent.getWidth() * KEYBOARD_ZONE_SHARE;
+            edgeDownTopLeft = left && y < parent.getHeight() * KEYBOARD_ZONE_SHARE;
+            left &= edgeDownTopLeft || y > parent.getHeight() * (1 - KEYBOARD_ZONE_SHARE);
             edgeDownTopRight = event.getRawX() - at[0] > parent.getWidth() * (1 - KEYBOARD_ZONE_SHARE) &&
                     event.getRawY() - at[1] < parent.getHeight() * KEYBOARD_ZONE_SHARE;
             if (left || edgeDownTopRight) {
@@ -1335,6 +1338,7 @@ final class GameTouchInput {
                 edgeDown = null;
                 panelSwallowsGesture = true;
                 if (edgeDownTopRight) game.keyboardInput.toggleKeyboardFromSwipe();
+                else if (edgeDownTopLeft) game.keyboardInput.togglePcKeyboard();
                 else panel.toggle();
                 return true;
             }
