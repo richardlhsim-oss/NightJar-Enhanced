@@ -146,7 +146,7 @@
     <string name="summary_resolution_list">Choose a resolution below your screen’s size for upscaling, such as 720p on a 1080p screen. Lower values reduce network and decoding load.</string>
     <string name="title_fps_list">Video frame rate</string>
     <string name="summary_fps_list">Higher frame rates give smoother motion.</string>
-    <string name="title_seekbar_bitrate">Video bitrate</string>
+    <string name="title_seekbar_bitrate">Video bitrate (local Wi-Fi)</string>
     <string name="suffix_seekbar_bitrate_mbps">Mbps</string>
     <string name="dialog_seekbar_bitrate">Local network: try 20–80 Mbps.\nPyroWave: about 280 Mbps at 720p/60.</string>
     <string name="seekbar_decrease">Decrease</string>

@@ -170,6 +170,11 @@ final class GameConnection {
         LimeLog.info("Stream request: " + game.prefConfig.width + "x" + game.prefConfig.height + " at " + game.prefConfig.fps +
                 " fps (resolution " + game.prefConfig.resolutionSource() +
                 (game.prefConfig.vrr ? ", VRR at the panel's " + game.panelMaxRefreshRate + " Hz" : "") + ")");
+        if (com.limelight.preferences.RemoteConnection.isRemote(game.getIntent().getStringExtra(Game.EXTRA_HOST))) {
+            game.prefConfig.bitrate = game.prefConfig.remoteBitrate;
+            LimeLog.info("Remote connection: " + game.prefConfig.bitrate + " kbps");
+            game.messages.alert(game.getString(R.string.remote_connection_bitrate, game.prefConfig.bitrate / 1000f), Toast.LENGTH_LONG);
+        }
         LimeLog.info("PC's own stream values: " + (game.prefConfig.pcSettings == null ? "none" : game.prefConfig.pcSettings));
         if (game.prefConfig.layers != null) {
             LimeLog.info("Stream settings layers: " + com.limelight.preferences.StreamLayers.describe(game.prefConfig.layers));

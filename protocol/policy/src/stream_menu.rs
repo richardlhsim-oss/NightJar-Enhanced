@@ -144,8 +144,8 @@ pub const TILES: &[Tile] = &[
     more("reconnect"),
     footer("disconnect", Some(l("disconnect", "Disconnect"))),
     footer("end_host_session", Some(l("end_session", "End session"))),
-    footer("close_game", Some(l("close_game", "Quit game"))),
-    footer("quit_game", Some(l("quit_game", "Quit game"))),
+    footer("close_game", Some(l("close_game", "End connection"))),
+    footer("quit_game", Some(l("quit_game", "End connection"))),
     footer("end_session", None),
 ];
 

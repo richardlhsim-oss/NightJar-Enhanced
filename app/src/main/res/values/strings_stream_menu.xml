@@ -24,12 +24,12 @@
     <string name="stream_keyboard_keys_hide">Hide extra keyboard keys</string>
     <string name="stream_overlay_page">Overlay and diagnostics</string>
     <string name="stream_picture_in_picture">Picture-in-picture</string>
-    <string name="stream_quit_game">Quit game</string>
+    <string name="stream_quit_game">End connection</string>
     <string name="stream_quit_game_confirm">Quit the game on the PC?\nUnsaved progress will be lost.</string>
     <string name="stream_end_session">End session</string>
     <string name="stream_end_session_confirm">End the stream session on the PC?
 The game keeps running.</string>
-    <string name="stream_close_game">Quit game</string>
+    <string name="stream_close_game">End connection</string>
     <string name="stream_close_game_confirm">Close the game on the PC?
 Unsaved progress will be lost.</string>
     <string name="stream_choice_selected">Selected</string>
@@ -86,8 +86,8 @@ Unsaved progress will be lost.</string>
     <string name="stream_tile_add_shortcut">Add shortcut</string>
     <string name="stream_tile_disconnect">Disconnect</string>
     <string name="stream_tile_end_session">End session</string>
-    <string name="stream_tile_close_game">Quit game</string>
-    <string name="stream_tile_quit_game">Quit game</string>
+    <string name="stream_tile_close_game">End connection</string>
+    <string name="stream_tile_quit_game">End connection</string>
     <string name="stream_shortcut_key_unsupported">%1$s can’t be part of a shortcut: tap it to take it out.</string>
     <string name="stream_shortcut_no_keyboard">Shortcut not sent: this device may not send keyboard input to the PC.</string>
     <string name="stream_shortcut_not_sent">Shortcut not sent: the stream isn’t taking input right now.</string>

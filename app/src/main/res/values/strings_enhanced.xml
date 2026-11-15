@@ -17,4 +17,7 @@
     <string name="stream_pc_audio_off" translatable="false">Stop audio on PC</string>
     <string name="desktop_connect" translatable="false">Connect</string>
     <string name="desktop_terminate" translatable="false">Terminate</string>
+    <string name="title_remote_bitrate" translatable="false">Video bitrate (remote connection)</string>
+    <string name="dialog_remote_bitrate" translatable="false">Used instead of the video bitrate when the PC is outside this network: over the internet or a VPN such as Tailscale. Starts at the lowest rate.</string>
+    <string name="remote_connection_bitrate" translatable="false">Remote connection: %1$.1f Mbps</string>
 </resources>

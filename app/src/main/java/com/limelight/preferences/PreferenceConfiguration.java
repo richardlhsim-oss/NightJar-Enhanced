@@ -289,6 +289,8 @@ public class PreferenceConfiguration {
     public int streamOrientation = StreamOrientation.AUTO;
     // Send this device's microphone to the host when the host offers to take it.
     public boolean enableMic;
+    // The bitrate for a PC outside this network (RemoteConnection).
+    public int remoteBitrate;
     // How the microphone is cleaned up before it is sent (MicProcessing).
     public String micEcho = MicProcessing.Echo.AUTO.key;
     public String micEchoEngine = MicProcessing.EchoEngine.OWN.key;
@@ -1442,6 +1444,7 @@ public class PreferenceConfiguration {
                 prefs.getString(StreamOrientation.PREF, null));
         config.playHostAudio = prefs.getBoolean(HOST_AUDIO_PREF_STRING, DEFAULT_HOST_AUDIO);
         config.enableMic = prefs.getBoolean(ENABLE_MIC_PREF_STRING, DEFAULT_ENABLE_MIC);
+        config.remoteBitrate = RemoteConnection.bitrateKbps(prefs);
         config.micEcho = MicProcessing.Echo.of(prefs.getString(MIC_ECHO_PREF_STRING, null)).key;
         config.micEchoEngine = MicProcessing.EchoEngine.of(prefs.getString(MIC_ECHO_ENGINE_PREF_STRING, null)).key;
         config.micNoiseSuppression = prefs.getBoolean(MIC_NOISE_PREF_STRING, true);

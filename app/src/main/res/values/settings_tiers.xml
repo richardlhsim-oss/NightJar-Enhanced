@@ -12,6 +12,7 @@
         <item>seekbar_bitrate_kbps</item>
         <item>checkbox_auto_bitrate</item>
         <item>list_mobile_bitrate_kbps</item>
+        <item>seekbar_remote_bitrate_kbps</item>
         <item>video_format</item>
         <item>checkbox_enable_hdr</item>
     </string-array>

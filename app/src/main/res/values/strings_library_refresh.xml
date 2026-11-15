@@ -2,7 +2,7 @@
     <string name="library_search">Search games</string>
     <string name="library_options">Library options</string>
     <string name="library_more_for">More options for %1$s</string>
-    <string name="library_play">Play</string>
+    <string name="library_play">Connect</string>
     <string name="library_open">Open library</string>
     <string name="library_loading">Loading your library…</string>
     <string name="library_refresh">Refresh library</string>
