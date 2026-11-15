@@ -27,10 +27,14 @@ public class NightjarApplication extends Application {
     // Once, so an install from before these defaults gets them and a later choice is kept.
     private void applyEnhancedDefaults() {
         android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean("enhanced_audio_defaults", false)) return;
-        prefs.edit().putBoolean("enhanced_audio_defaults", true)
-                .putBoolean(com.limelight.preferences.PreferenceConfiguration.ENABLE_MIC_PREF_STRING, true)
-                .putBoolean(com.limelight.preferences.PreferenceConfiguration.MIC_BUTTON_PREF_STRING, true)
-                .putBoolean(com.limelight.preferences.PreferenceConfiguration.HOST_AUDIO_PREF_STRING, false).apply();
+        if (!prefs.getBoolean("enhanced_audio_defaults", false)) {
+            prefs.edit().putBoolean("enhanced_audio_defaults", true)
+                    .putBoolean(com.limelight.preferences.PreferenceConfiguration.ENABLE_MIC_PREF_STRING, true)
+                    .putBoolean(com.limelight.preferences.PreferenceConfiguration.HOST_AUDIO_PREF_STRING, false).apply();
+        }
+        if (!prefs.getBoolean("enhanced_mic_button_hidden", false)) {
+            prefs.edit().putBoolean("enhanced_mic_button_hidden", true)
+                    .putBoolean(com.limelight.preferences.PreferenceConfiguration.MIC_BUTTON_PREF_STRING, false).apply();
+        }
     }
 }

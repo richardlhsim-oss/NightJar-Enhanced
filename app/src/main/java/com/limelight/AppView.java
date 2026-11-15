@@ -930,7 +930,7 @@ public class AppView extends NightjarActivity implements AdapterFragmentCallback
                     R.drawable.ic_play, getString(R.string.applist_menu_resume));
             if (canLaunch) {
                 addAppAction(sheet, selectedApp, selectedView, QUIT_ID,
-                        R.drawable.ic_stop, getString(R.string.applist_menu_quit));
+                        R.drawable.ic_stop, getString(com.limelight.console.DesktopLabels.end(selectedApp.app.getAppName(), R.string.applist_menu_quit)));
             }
         } else if (hostRunningGame && canLaunch) {
             AppObject running = runningApp();
@@ -949,7 +949,7 @@ public class AppView extends NightjarActivity implements AdapterFragmentCallback
             }
         } else if (canLaunch) {
             addAppAction(sheet, selectedApp, selectedView, START_OR_RESUME_ID,
-                    R.drawable.ic_play, getString(R.string.library_play));
+                    R.drawable.ic_play, getString(com.limelight.console.DesktopLabels.start(selectedApp.app.getAppName(), R.string.library_play)));
         }
         addSmallStreamInputOnlyAction(sheet, selectedApp);
         if (LaunchPolicy.offersQuitOnLeave(canLaunch, selectedApp.app.getControl(), selectedApp.app.getRole())) {

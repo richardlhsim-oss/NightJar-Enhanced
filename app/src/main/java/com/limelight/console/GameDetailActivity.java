@@ -698,11 +698,11 @@ public class GameDetailActivity extends NightjarActivity implements HostFeed.Lis
 
         switch (m.endAction) {
             case CLOSE_GAME:
-                end.setText(R.string.stream_close_game);
+                end.setText(DesktopLabels.end(m.title, R.string.stream_close_game));
                 end.setVisibility(View.VISIBLE);
                 break;
             case QUIT:
-                end.setText(R.string.applist_menu_quit);
+                end.setText(DesktopLabels.end(m.title, R.string.applist_menu_quit));
                 end.setVisibility(View.VISIBLE);
                 break;
             default:
@@ -808,7 +808,7 @@ public class GameDetailActivity extends NightjarActivity implements HostFeed.Lis
         if (wakeable(m)) {
             play.setText(waiting ? R.string.wol_waking_pc : R.string.console_wake_and_play);
         } else {
-            play.setText(m.resumes() ? R.string.applist_menu_resume : R.string.library_play);
+            play.setText(DesktopLabels.start(m.title, m.resumes() ? R.string.applist_menu_resume : R.string.library_play));
         }
         play.setEnabled(m.canStart() || wakeable(m));
     }
@@ -1007,6 +1007,7 @@ public class GameDetailActivity extends NightjarActivity implements HostFeed.Lis
                 ? R.string.stream_close_game_confirm : R.string.applist_quit_confirmation;
         int action = model.endAction == GameDetailModel.EndAction.CLOSE_GAME
                 ? R.string.stream_close_game : R.string.applist_menu_quit;
+        action = DesktopLabels.end(app != null ? app.getAppName() : null, action);
         UiHelper.showDialog(this, new com.limelight.ui.NavigationDialogBuilder(this).startOnCancel()
                 .setMessage(message)
                 .setPositiveButton(action, (dialog, which) -> end(app, computer, () -> runOnUiThread(() -> {

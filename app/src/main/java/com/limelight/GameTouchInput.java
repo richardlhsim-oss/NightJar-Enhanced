@@ -91,7 +91,8 @@ final class GameTouchInput {
 
     private static final float PANEL_EDGE_DP = 32, PANEL_SWIPE_DP = 40;
     private static final int CLICK_HOLD_MS = 40, CLICK_GAP_MS = 60;
-    private static final float KEYBOARD_ZONE_HEIGHT_DP = 200;
+    // The top-right part of the screen, as a share of its width and of its height.
+    private static final float KEYBOARD_ZONE_SHARE = 0.3f;
     private boolean edgeDownTopRight;
     private MotionEvent edgeDown;
     private boolean panelSwallowsGesture;
@@ -1292,8 +1293,9 @@ final class GameTouchInput {
     }
 
     /**
-     * A finger landing on the left edge waits here until it swipes right, which shows or hides the bar; one on the
-     * top of the right edge until it swipes left, which shows or hides the keyboard;
+     * A finger landing on the left edge waits here until it swipes right, which shows or hides the bar; one in the
+     * top-right corner until it swipes left, which shows or hides the keyboard, or down, which shows it until a few
+     * seconds pass without typing;
      * anything else then reaches the stream from its first event.
      */
     private boolean routeEdgeSwipe(View view, MotionEvent event) {
@@ -1310,8 +1312,8 @@ final class GameTouchInput {
             int[] at = new int[2];
             parent.getLocationOnScreen(at);
             boolean left = event.getRawX() - at[0] < PANEL_EDGE_DP * density;
-            edgeDownTopRight = at[0] + parent.getWidth() - event.getRawX() < PANEL_EDGE_DP * density &&
-                    event.getRawY() - at[1] < KEYBOARD_ZONE_HEIGHT_DP * density;
+            edgeDownTopRight = event.getRawX() - at[0] > parent.getWidth() * (1 - KEYBOARD_ZONE_SHARE) &&
+                    event.getRawY() - at[1] < parent.getHeight() * KEYBOARD_ZONE_SHARE;
             if (left || edgeDownTopRight) {
                 edgeDown = MotionEvent.obtain(event);
                 return true;
@@ -1321,11 +1323,18 @@ final class GameTouchInput {
         if (edgeDown == null) return false;
         float dx = event.getRawX() - edgeDown.getRawX(), dy = event.getRawY() - edgeDown.getRawY();
         if (action == MotionEvent.ACTION_MOVE) {
+            if (edgeDownTopRight && dy > PANEL_SWIPE_DP * density && dy > 2 * Math.abs(dx)) {
+                edgeDown.recycle();
+                edgeDown = null;
+                panelSwallowsGesture = true;
+                game.keyboardInput.showKeyboardBriefly();
+                return true;
+            }
             if ((edgeDownTopRight ? -dx : dx) > PANEL_SWIPE_DP * density && Math.abs(dx) > 2 * Math.abs(dy)) {
                 edgeDown.recycle();
                 edgeDown = null;
                 panelSwallowsGesture = true;
-                if (edgeDownTopRight) game.toggleKeyboard();
+                if (edgeDownTopRight) game.keyboardInput.toggleKeyboardFromSwipe();
                 else panel.toggle();
                 return true;
             }

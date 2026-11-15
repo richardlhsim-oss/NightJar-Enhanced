@@ -246,6 +246,37 @@ final class GameKeyboardInput {
     // Whether a host text field may open the soft keyboard, whose it is, and how far the stream
     // moves up for it.
     private final HostKeyboard hostKeyboard = new HostKeyboard();
+    private static final long BRIEF_KEYBOARD_MS = 3000;
+    private long lastTypedAt;
+    private boolean briefKeyboard;
+    private final Runnable briefKeyboardCheck = this::checkBriefKeyboard;
+
+    /** Shows the soft keyboard and hides it again once BRIEF_KEYBOARD_MS pass without typing. */
+    void showKeyboardBriefly() {
+        if (!hostKeyboard.visible()) game.toggleKeyboard();
+        briefKeyboard = true;
+        lastTypedAt = SystemClock.uptimeMillis();
+        game.keyboardPanHandler.removeCallbacks(briefKeyboardCheck);
+        game.keyboardPanHandler.postDelayed(briefKeyboardCheck, BRIEF_KEYBOARD_MS);
+    }
+
+    // A keyboard opened to stay open is not hidden by an earlier brief one.
+    void toggleKeyboardFromSwipe() {
+        briefKeyboard = false;
+        game.keyboardPanHandler.removeCallbacks(briefKeyboardCheck);
+        game.toggleKeyboard();
+    }
+
+    private void checkBriefKeyboard() {
+        if (!briefKeyboard) return;
+        long idle = SystemClock.uptimeMillis() - lastTypedAt;
+        if (idle < BRIEF_KEYBOARD_MS) {
+            game.keyboardPanHandler.postDelayed(briefKeyboardCheck, BRIEF_KEYBOARD_MS - idle);
+            return;
+        }
+        briefKeyboard = false;
+        if (hostKeyboard.visible()) game.toggleKeyboard();
+    }
     // How much of the window's bottom the soft keyboard covers, from the last inset dispatch.
     private int keyboardInsetBottom;
 
@@ -565,6 +596,7 @@ final class GameKeyboardInput {
                 return false;
             }
             hostKeyboard.onInput(SystemClock.uptimeMillis());
+            lastTypedAt = SystemClock.uptimeMillis();
 
             // We'll send it as a raw key event if we have a key mapping, otherwise we'll send it
             // as UTF-8 text (if it's a printable character).
@@ -678,6 +710,7 @@ final class GameKeyboardInput {
     }
 
     boolean handleTextInput(CharSequence text) {
+        lastTypedAt = SystemClock.uptimeMillis();
         if (!game.grabbedInput || game.conn == null || !game.conn.canSendInput()) {
             return false;
         }

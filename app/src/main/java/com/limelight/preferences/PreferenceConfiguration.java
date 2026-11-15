@@ -1447,7 +1447,7 @@ public class PreferenceConfiguration {
         config.micNoiseSuppression = prefs.getBoolean(MIC_NOISE_PREF_STRING, true);
         config.micAutoGain = prefs.getBoolean(MIC_AUTO_GAIN_PREF_STRING, false);
         config.micGainPercent = MicGain.clampPercent(prefs.getInt(MIC_GAIN_PREF_STRING, MicGain.DEFAULT_PERCENT));
-        config.micButton = prefs.getBoolean(MIC_BUTTON_PREF_STRING, true);
+        config.micButton = prefs.getBoolean(MIC_BUTTON_PREF_STRING, false);
         config.floatingMenuButton = prefs.getBoolean(FLOATING_MENU_BUTTON_PREF_STRING, false);
         config.oscStyle = oscStyle(prefs.getString(OSC_STYLE_PREF_STRING, null));
         config.oscFloatingSticks = !OSC_STICK_FIXED.equals(prefs.getString(OSC_STICK_MODE_PREF_STRING, null));

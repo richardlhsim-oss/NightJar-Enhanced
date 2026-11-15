@@ -15,4 +15,6 @@
     <string name="stream_size_changed" translatable="false">Stream changed to %1$d×%2$d</string>
     <string name="stream_pc_audio_on" translatable="false">Play audio on PC</string>
     <string name="stream_pc_audio_off" translatable="false">Stop audio on PC</string>
+    <string name="desktop_connect" translatable="false">Connect</string>
+    <string name="desktop_terminate" translatable="false">Terminate</string>
 </resources>
