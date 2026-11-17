@@ -97,6 +97,37 @@ final class GameTouchInput {
     // The top-right zone, which shows the keyboard, is taller.
     private static final float TOP_RIGHT_ZONE_HEIGHT_SHARE = 0.45f;
     private MotionEvent edgeDown;
+    // How close to an edge of the zoomed view the mouse pans it.
+    private static final float MOUSE_EDGE_DP = 40;
+    // Where a captured mouse's cursor is on the host while zoomed, in stream pixels; NaN until it moves there.
+    private float zoomedMouseX = Float.NaN, zoomedMouseY = Float.NaN;
+
+    private boolean zoomedDesktop() {
+        boolean zoomed = game.desktopGestures != null && game.desktopGestures.enabled() &&
+                game.desktopGestures.viewport().scale() > 1 && game.streamView.getWidth() > 0 && game.streamView.getHeight() > 0;
+        if (!zoomed) zoomedMouseX = zoomedMouseY = Float.NaN;
+        return zoomed;
+    }
+
+    /**
+     * A captured mouse only reports how far it moved, so the host's cursor is unknown here. While zoomed the cursor
+     * goes to a position kept here instead, starting at the view's centre, and the view follows it to the edges.
+     */
+    private void moveZoomedMouse(short dx, short dy) {
+        com.limelight.ui.DesktopViewport viewport = game.desktopGestures.viewport();
+        float viewWidth = game.streamView.getWidth(), viewHeight = game.streamView.getHeight();
+        int width = game.prefConfig.width, height = game.prefConfig.height;
+        if (Float.isNaN(zoomedMouseX)) {
+            zoomedMouseX = viewport.inputX(viewWidth / 2) / viewWidth * width;
+            zoomedMouseY = viewport.inputY(viewHeight / 2) / viewHeight * height;
+        }
+        zoomedMouseX = Math.max(0, Math.min(width - 1, zoomedMouseX + dx));
+        zoomedMouseY = Math.max(0, Math.min(height - 1, zoomedMouseY + dy));
+        game.conn.sendMousePosition((short) zoomedMouseX, (short) zoomedMouseY, (short) width, (short) height);
+        game.desktopGestures.follow(zoomedMouseX / width * viewWidth * viewport.scale() + viewport.x(),
+                zoomedMouseY / height * viewHeight * viewport.scale() + viewport.y(),
+                MOUSE_EDGE_DP * game.getResources().getDisplayMetrics().density);
+    }
     private boolean panelSwallowsGesture;
 
     // A USB or Bluetooth mouse, not a touchscreen or a virtual device.
@@ -837,6 +868,9 @@ final class GameTouchInput {
                 (!game.prefConfig.touchscreenTrackpad || event.getToolType(0) != MotionEvent.TOOL_TYPE_FINGER)) {
             MotionEvent translated = MotionEvent.obtain(event);
             translated.offsetLocation(getStreamViewOffsetX(view), getStreamViewOffsetY(view));
+            if (event.getToolType(0) == MotionEvent.TOOL_TYPE_MOUSE) {
+                game.desktopGestures.follow(translated.getX(), translated.getY(), MOUSE_EDGE_DP * game.getResources().getDisplayMetrics().density);
+            }
             com.limelight.ui.DesktopViewport viewport = game.desktopGestures.viewport();
             android.graphics.Matrix inverse = new android.graphics.Matrix();
             inverse.setValues(new float[] {1 / viewport.scale(), 0, -viewport.x() / viewport.scale(),
@@ -919,7 +953,10 @@ final class GameTouchInput {
                     short deltaY = (short)mouseDeltaY.scale(game.inputCaptureProvider.getRelativeAxisY(event), game.prefConfig.mouseSpeed / 100f);
 
                     if (deltaX != 0 || deltaY != 0) {
-                        if (game.prefConfig.absoluteMouseMode) {
+                        if (zoomedDesktop()) {
+                            moveZoomedMouse(deltaX, deltaY);
+                        }
+                        else if (game.prefConfig.absoluteMouseMode) {
                             // NB: view may be null, but we can unconditionally use streamView because we don't need to adjust
                             // relative axis deltas for the position of the streamView within the parent's coordinate system.
                             game.conn.sendMouseMoveAsMousePosition(deltaX, deltaY, (short)game.streamView.getWidth(), (short)game.streamView.getHeight());

@@ -6,6 +6,8 @@ public final class DesktopViewport {
     public float scale() { return scale; }
     public float x() { return x; }
     public float y() { return y; }
+    public float width() { return width; }
+    public float height() { return height; }
     public void resize(float width, float height) {
         if (!(width > 0 && height > 0)) return;
         x *= width / this.width; y *= height / this.height;

@@ -72,6 +72,16 @@ public final class DesktopGestures {
         flushClicks();
     }
     public void reset() { viewport.reset(); apply(); }
+
+    /** Pans so a point on the view, as zoomed, stays at least margin inside its edges: a mouse at an edge moves the view. */
+    public void follow(float x, float y, float margin) {
+        float w = viewport.width(), h = viewport.height(), dx = 0, dy = 0;
+        if (x < margin) dx = margin - x; else if (x > w - margin) dx = w - margin - x;
+        if (y < margin) dy = margin - y; else if (y > h - margin) dy = h - margin - y;
+        if (dx == 0 && dy == 0) return;
+        viewport.pan(dx, dy);
+        apply();
+    }
     private void apply() { view.setVideoTransform(viewport.scale(), viewport.x(), viewport.y()); }
 
     public boolean onTouch(MotionEvent event, boolean allowRightClick) {

@@ -142,6 +142,19 @@ public class DesktopGesturesTest {
     }
 
     @Test
+    public void aMouseAtAnEdgeMovesTheZoomedViewWithIt() {
+        gestures.setEnabled(true);
+        gestures.viewport().zoom(2, 400, 200);
+        float x = gestures.viewport().x();
+        gestures.follow(400, 200, 40);
+        assertEquals("away from the edges, nothing moves", x, gestures.viewport().x(), 0);
+        gestures.follow(790, 200, 40);
+        assertEquals("30 px past the margin on the right: the view goes 30 px left", x - 30, gestures.viewport().x(), .01f);
+        gestures.follow(5, 200, 40);
+        assertEquals(x - 30 + 35, gestures.viewport().x(), .01f);
+    }
+
+    @Test
     public void withZoomOffPressAndMoveDragsAtOnce() {
         gestures.setEnabled(false);
         touch(MotionEvent.ACTION_DOWN, 100, 100);
