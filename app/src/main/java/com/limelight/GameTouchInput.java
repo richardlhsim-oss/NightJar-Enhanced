@@ -102,6 +102,33 @@ final class GameTouchInput {
     // Where a captured mouse's cursor is on the host while zoomed, in stream pixels; NaN until it moves there.
     private float zoomedMouseX = Float.NaN, zoomedMouseY = Float.NaN;
 
+    // A mouse or a touchpad driving a pointer, whatever tool type the device gives its events.
+    private static boolean isMouse(MotionEvent event) {
+        InputDevice device = event.getDevice();
+        return event.getToolType(0) == MotionEvent.TOOL_TYPE_MOUSE ||
+                (device != null && (device.supportsSource(InputDevice.SOURCE_MOUSE) || device.supportsSource(InputDevice.SOURCE_TOUCHPAD)) &&
+                        event.getToolType(0) != MotionEvent.TOOL_TYPE_FINGER && event.getToolType(0) != MotionEvent.TOOL_TYPE_STYLUS);
+    }
+
+    private boolean mouseReported;
+
+    // Once a stream, the first mouse movement says what this device reports, to find why edge panning does not follow.
+    private void reportMouseOnce(MotionEvent event) {
+        if (mouseReported || event.getActionMasked() == MotionEvent.ACTION_DOWN) return;
+        int source = event.getSource();
+        boolean pointer = (source & InputDevice.SOURCE_CLASS_POINTER) != 0 || source == InputDevice.SOURCE_MOUSE_RELATIVE ||
+                (source & InputDevice.SOURCE_CLASS_POSITION) != 0;
+        if (!pointer || !isMouse(event) || game.inputCaptureProvider == null) return;
+        mouseReported = true;
+        String text = "Mouse: source 0x" + Integer.toHexString(source) + ", tool " + event.getToolType(0) +
+                ", captured " + game.inputCaptureProvider.isCapturingActive() +
+                ", relative " + game.inputCaptureProvider.eventHasRelativeMouseAxes(event) +
+                ", zoom " + (game.desktopGestures == null ? "none" : (game.desktopGestures.enabled() ? "on " : "off ") +
+                game.desktopGestures.viewport().scale());
+        LimeLog.info(text);
+        game.messages.alert(text, android.widget.Toast.LENGTH_LONG);
+    }
+
     private boolean zoomedDesktop() {
         boolean zoomed = game.desktopGestures != null && game.desktopGestures.enabled() &&
                 game.desktopGestures.viewport().scale() > 1 && game.streamView.getWidth() > 0 && game.streamView.getHeight() > 0;
@@ -860,6 +887,7 @@ final class GameTouchInput {
     // NB: View is only present if called from a view callback
     boolean handleMotionEvent(View view, MotionEvent event) {
         game.keyboardInput.noteStreamPress(view, event);
+        reportMouseOnce(event);
         if (game.gameTouchControls != null && game.gameTouchControls.isEditing() &&
                 (event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0) return true;
         if (game.desktopGestures != null && game.desktopGestures.enabled() &&
@@ -868,7 +896,7 @@ final class GameTouchInput {
                 (!game.prefConfig.touchscreenTrackpad || event.getToolType(0) != MotionEvent.TOOL_TYPE_FINGER)) {
             MotionEvent translated = MotionEvent.obtain(event);
             translated.offsetLocation(getStreamViewOffsetX(view), getStreamViewOffsetY(view));
-            if (event.getToolType(0) == MotionEvent.TOOL_TYPE_MOUSE) {
+            if (isMouse(event)) {
                 game.desktopGestures.follow(translated.getX(), translated.getY(), MOUSE_EDGE_DP * game.getResources().getDisplayMetrics().density);
             }
             com.limelight.ui.DesktopViewport viewport = game.desktopGestures.viewport();
