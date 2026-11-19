@@ -99,6 +99,15 @@ final class GameTouchInput {
     private MotionEvent edgeDown;
     // How close to an edge of the zoomed view the mouse pans it.
     private static final float MOUSE_EDGE_DP = 40;
+    // Where the device's pointer rests while the view pans under it; one runnable for every mouse event.
+    private float edgePointerX, edgePointerY;
+    private final Runnable sendEdgePointer = this::sendEdgePointer;
+
+    private void sendEdgePointer() {
+        com.limelight.ui.DesktopViewport v = game.desktopGestures.viewport();
+        game.conn.sendMousePosition((short) v.inputX(edgePointerX), (short) v.inputY(edgePointerY),
+                (short) game.streamView.getWidth(), (short) game.streamView.getHeight());
+    }
     // Where a captured mouse's cursor is on the host while zoomed, in stream pixels; NaN until it moves there.
     private float zoomedMouseX = Float.NaN, zoomedMouseY = Float.NaN;
 
@@ -878,14 +887,10 @@ final class GameTouchInput {
             MotionEvent translated = MotionEvent.obtain(event);
             translated.offsetLocation(getStreamViewOffsetX(view), getStreamViewOffsetY(view));
             if (isMouse(event)) {
-                float x = translated.getX(), y = translated.getY();
-                int action = event.getActionMasked();
-                game.desktopGestures.pointerAt(x, y, MOUSE_EDGE_DP * game.getResources().getDisplayMetrics().density,
-                        action == MotionEvent.ACTION_HOVER_EXIT ? null : () -> {
-                            com.limelight.ui.DesktopViewport v = game.desktopGestures.viewport();
-                            game.conn.sendMousePosition((short) v.inputX(x), (short) v.inputY(y),
-                                    (short) game.streamView.getWidth(), (short) game.streamView.getHeight());
-                        });
+                edgePointerX = translated.getX();
+                edgePointerY = translated.getY();
+                game.desktopGestures.pointerAt(edgePointerX, edgePointerY, MOUSE_EDGE_DP * game.getResources().getDisplayMetrics().density,
+                        event.getActionMasked() == MotionEvent.ACTION_HOVER_EXIT ? null : sendEdgePointer);
             }
             com.limelight.ui.DesktopViewport viewport = game.desktopGestures.viewport();
             android.graphics.Matrix inverse = new android.graphics.Matrix();

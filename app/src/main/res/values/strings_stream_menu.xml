@@ -25,12 +25,12 @@
     <string name="stream_overlay_page">Overlay and diagnostics</string>
     <string name="stream_picture_in_picture">Picture-in-picture</string>
     <string name="stream_quit_game">End connection</string>
-    <string name="stream_quit_game_confirm">Quit the game on the PC?\nUnsaved progress will be lost.</string>
+    <string name="stream_quit_game_confirm">End the connection on the PC?\nUnsaved progress will be lost.</string>
     <string name="stream_end_session">End session</string>
     <string name="stream_end_session_confirm">End the stream session on the PC?
-The game keeps running.</string>
+Open apps keep running on the PC.</string>
     <string name="stream_close_game">End connection</string>
-    <string name="stream_close_game_confirm">Close the game on the PC?
+    <string name="stream_close_game_confirm">End the connection on the PC?
 Unsaved progress will be lost.</string>
     <string name="stream_choice_selected">Selected</string>
     <string name="stream_choice_not_selected">Not selected</string>

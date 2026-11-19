@@ -22,7 +22,7 @@ public final class HttpClipboardSync {
         void send(String text) throws Exception;
     }
 
-    static final int POLL_MS = 2000;
+    static final int POLL_MS = 3000;
     private static final String PERMISSION_DENIED = "permission denied";
 
     private final Transport transport;
@@ -43,7 +43,7 @@ public final class HttpClipboardSync {
 
     public static HttpClipboardSync forStream(Context context, NvConnection conn, Consumer<String> sayDenied) {
         Transport transport = new Transport() {
-            @Override public String get() throws Exception { return conn.getClipboard(); }
+            @Override public String get() throws Exception { return conn.pollClipboard(); }
             @Override public void send(String text) throws Exception { conn.sendClipboard(text); }
         };
         return new HttpClipboardSync(transport, new ClipboardSync.AndroidClipboard(context),

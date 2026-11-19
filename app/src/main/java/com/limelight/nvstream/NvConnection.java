@@ -1674,6 +1674,17 @@ public class NvConnection {
         return http.sendFoundationAbrFeedback(feedback);
     }
 
+    /**
+     * The host's clipboard text for a check repeated every few seconds: the read permission is the one the host last
+     * stated rather than a new serverinfo request each time.
+     */
+    public String pollClipboard() throws IOException, XmlPullParserException {
+        ComputerDetails details = hostDetails;
+        if (details == null) return getClipboard();
+        if (!details.canReadClipboard()) throw new IOException("Host clipboard read permission denied");
+        return http.getClipboard();
+    }
+
     public String getClipboard() throws IOException, XmlPullParserException {
         if (!refreshHostDetails().canReadClipboard()) {
             throw new IOException("Host clipboard read permission denied");
