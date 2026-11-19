@@ -577,6 +577,13 @@ final class GameConnection {
                 game.touchInput::cancelHostTouchInput, game.touchInput::clickRightMouseButton);
         game.trackpadPointer.setViewport(game.desktopGestures.viewport());
         game.desktopGestures.setPointer(game.touchInput.gesturePointer);
+        // Zoomed in, the device's own pointer shows and points: it pans the view at the edges and the host's cursor
+        // goes where it points. Back at full size the mouse is captured again.
+        game.desktopGestures.setZoomListener(zoomed -> {
+            if (game.inputCaptureProvider == null || !game.grabbedInput || game.cursorVisible) return;
+            if (zoomed) game.inputCaptureProvider.showCursor();
+            else game.inputCaptureProvider.hideCursor();
+        });
         android.content.SharedPreferences enhancedPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(game);
         game.desktopGestures.setEnabled(enhancedPrefs.getBoolean(com.limelight.GameVideoOutput.ZOOM_PREF, true) &&
                 (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || game.prefConfig.useTextureView));

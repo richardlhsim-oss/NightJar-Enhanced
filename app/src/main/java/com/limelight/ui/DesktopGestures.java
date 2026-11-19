@@ -37,6 +37,8 @@ public final class DesktopGestures {
     private long lastFrameNanos;
     private float pointerX, pointerY, pointerMargin;
     private Runnable pointerMoved;
+    private boolean wasZoomed;
+    private java.util.function.Consumer<Boolean> zoomListener;
     private final StreamView view;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable cancelInput;
@@ -136,7 +138,17 @@ public final class DesktopGestures {
         if (at > size - pointerMargin) return -Math.min(1, (at - (size - pointerMargin)) / pointerMargin);
         return 0;
     }
-    private void apply() { view.setVideoTransform(viewport.scale(), viewport.x(), viewport.y()); }
+    private void apply() {
+        view.setVideoTransform(viewport.scale(), viewport.x(), viewport.y());
+        boolean zoomed = viewport.scale() > 1;
+        if (zoomed != wasZoomed) {
+            wasZoomed = zoomed;
+            if (zoomListener != null) zoomListener.accept(zoomed);
+        }
+    }
+
+    /** Told when the view zooms in from full size or returns to it. */
+    public void setZoomListener(java.util.function.Consumer<Boolean> listener) { zoomListener = listener; }
 
     public boolean onTouch(MotionEvent event, boolean allowRightClick) {
         return onTouch(event, allowRightClick, false);

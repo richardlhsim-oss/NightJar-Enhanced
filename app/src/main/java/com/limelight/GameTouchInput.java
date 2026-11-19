@@ -489,7 +489,8 @@ final class GameTouchInput {
 
             // Enabling capture may hide the cursor again, so
             // we will need to show it again.
-            if (game.cursorVisible || game.keyboardInput.isKeyboardOverlayVisible() || game.keyboardInput.isPcKeyboardVisible()) {
+            if (game.cursorVisible || game.keyboardInput.isKeyboardOverlayVisible() || game.keyboardInput.isPcKeyboardVisible() ||
+                    (game.desktopGestures != null && game.desktopGestures.viewport().scale() > 1)) {
                 game.inputCaptureProvider.showCursor();
             }
         }
