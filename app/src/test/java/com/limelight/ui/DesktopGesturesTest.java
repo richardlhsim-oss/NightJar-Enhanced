@@ -155,6 +155,22 @@ public class DesktopGesturesTest {
     }
 
     @Test
+    public void aPointerRestingAtTheEdgeKeepsPanningAndTheHostCursorFollows() {
+        gestures.setEnabled(true);
+        gestures.viewport().zoom(2, 400, 200);
+        float x = gestures.viewport().x();
+        int[] moved = {0};
+        gestures.pointerAt(0, 200, 40, () -> moved[0]++);
+        idle(200);
+        assertTrue("the view moved right to show more on the left", gestures.viewport().x() > x);
+        assertTrue(moved[0] > 1);
+        int frames = moved[0];
+        gestures.pointerAt(400, 200, 40, () -> moved[0]++);
+        idle(200);
+        assertEquals("away from the edge it stops", frames, moved[0]);
+    }
+
+    @Test
     public void withZoomOffPressAndMoveDragsAtOnce() {
         gestures.setEnabled(false);
         touch(MotionEvent.ACTION_DOWN, 100, 100);

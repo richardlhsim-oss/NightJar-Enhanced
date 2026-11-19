@@ -31,6 +31,12 @@ public final class DesktopGestures {
     private static final int DOUBLE_TAP_MS = 350, DOUBLE_CLICK_WAIT_MS = 500, LONG_PRESS_MS = 650;
 
     private final DesktopViewport viewport = new DesktopViewport();
+    private static final float EDGE_PAN_DP_PER_S = 1500;
+    private final android.view.Choreographer.FrameCallback frame = this::onFrame;
+    private boolean framePosted;
+    private long lastFrameNanos;
+    private float pointerX, pointerY, pointerMargin;
+    private Runnable pointerMoved;
     private final StreamView view;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable cancelInput;
@@ -80,7 +86,55 @@ public final class DesktopGestures {
         if (y < margin) dy = margin - y; else if (y > h - margin) dy = h - margin - y;
         if (dx == 0 && dy == 0) return;
         viewport.pan(dx, dy);
+        applyNextFrame();
+    }
+
+    /**
+     * Android stops a visible pointer at the screen's edge and stops reporting it there, so a pointer resting within
+     * margin of an edge pans the view each frame, faster the nearer the edge, and moved is told so the host's cursor
+     * follows what is now under it. A pointer away from the edges, or null, stops it.
+     */
+    public void pointerAt(float x, float y, float margin, Runnable moved) {
+        pointerX = x;
+        pointerY = y;
+        pointerMargin = margin;
+        pointerMoved = moved;
+        if (moved != null) applyNextFrame();
+    }
+
+    // The view's transform moves a surface, which costs a frame: at most one per frame, however many mouse events.
+    private void applyNextFrame() {
+        if (framePosted) return;
+        framePosted = true;
+        lastFrameNanos = 0;
+        android.view.Choreographer.getInstance().postFrameCallback(frame);
+    }
+
+    private void onFrame(long nanos) {
+        framePosted = false;
+        float elapsed = lastFrameNanos == 0 ? 1 / 60f : Math.min(0.05f, (nanos - lastFrameNanos) / 1e9f);
+        lastFrameNanos = nanos;
+        boolean panning = false;
+        if (pointerMoved != null && viewport.scale() > 1) {
+            float w = viewport.width(), h = viewport.height(), step = EDGE_PAN_DP_PER_S * density * elapsed;
+            float dx = depth(pointerX, w) * step, dy = depth(pointerY, h) * step;
+            float beforeX = viewport.x(), beforeY = viewport.y();
+            viewport.pan(dx, dy);
+            panning = viewport.x() != beforeX || viewport.y() != beforeY;
+            if (panning) pointerMoved.run();
+        }
         apply();
+        if (panning) {
+            framePosted = true;
+            android.view.Choreographer.getInstance().postFrameCallback(frame);
+        }
+    }
+
+    // How far into the margin the pointer is, 0 to 1, positive to reveal what lies before the start edge.
+    private float depth(float at, float size) {
+        if (at < pointerMargin) return Math.min(1, (pointerMargin - at) / pointerMargin);
+        if (at > size - pointerMargin) return -Math.min(1, (at - (size - pointerMargin)) / pointerMargin);
+        return 0;
     }
     private void apply() { view.setVideoTransform(viewport.scale(), viewport.x(), viewport.y()); }
 
