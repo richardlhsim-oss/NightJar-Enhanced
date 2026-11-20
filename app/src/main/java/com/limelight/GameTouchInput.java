@@ -98,7 +98,7 @@ final class GameTouchInput {
     private static final float TOP_RIGHT_ZONE_HEIGHT_SHARE = 0.45f;
     private MotionEvent edgeDown;
     // How close to an edge of the zoomed view the mouse pans it.
-    private static final float MOUSE_EDGE_DP = 40;
+    private static final float MOUSE_EDGE_DP = 120;
     // Where the device's pointer rests while the view pans under it; one runnable for every mouse event.
     private float edgePointerX, edgePointerY;
     private final Runnable sendEdgePointer = this::sendEdgePointer;
