@@ -31,7 +31,7 @@ public final class DesktopGestures {
     private static final int DOUBLE_TAP_MS = 350, DOUBLE_CLICK_WAIT_MS = 500, LONG_PRESS_MS = 650;
 
     private final DesktopViewport viewport = new DesktopViewport();
-    private static final float EDGE_PAN_DP_PER_S = 1500;
+    private static final float EDGE_PAN_DP_PER_S = 3000;
     private final android.view.Choreographer.FrameCallback frame = this::onFrame;
     private boolean framePosted;
     private long lastFrameNanos;
