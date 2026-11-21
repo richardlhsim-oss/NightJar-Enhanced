@@ -32,10 +32,11 @@ public class NightjarApplication extends Application {
                     .putBoolean(com.limelight.preferences.PreferenceConfiguration.ENABLE_MIC_PREF_STRING, true)
                     .putBoolean(com.limelight.preferences.PreferenceConfiguration.HOST_AUDIO_PREF_STRING, false).apply();
         }
-        // 4.9.0-enhanced.10 started remote streams at 0.5 Mbps and may have stored it; the default is now 1 Mbps.
-        if (!prefs.getBoolean("enhanced_remote_1mbps", false)) {
-            android.content.SharedPreferences.Editor editor = prefs.edit().putBoolean("enhanced_remote_1mbps", true);
-            if (prefs.getInt(com.limelight.preferences.RemoteConnection.BITRATE_PREF, 0) == 500) {
+        // Earlier versions started remote streams at 0.5 or 1 Mbps and may have stored it; the default is now 1.5 Mbps.
+        if (!prefs.getBoolean("enhanced_remote_1_5mbps", false)) {
+            android.content.SharedPreferences.Editor editor = prefs.edit().putBoolean("enhanced_remote_1_5mbps", true);
+            int remote = prefs.getInt(com.limelight.preferences.RemoteConnection.BITRATE_PREF, 0);
+            if (remote == 500 || remote == 1000) {
                 editor.putInt(com.limelight.preferences.RemoteConnection.BITRATE_PREF, com.limelight.preferences.RemoteConnection.DEFAULT_BITRATE_KBPS);
             }
             editor.apply();

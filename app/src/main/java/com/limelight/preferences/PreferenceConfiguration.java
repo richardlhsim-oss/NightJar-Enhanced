@@ -557,7 +557,11 @@ public class PreferenceConfiguration {
         }
     }
 
+    // NightJar Enhanced: a stream on this network starts at 25 Mbps whatever its size and frame rate.
+    static final int LOCAL_DEFAULT_BITRATE_KBPS = 25000;
+
     public static int getDefaultBitrate(String resString, String fpsString) {
+        if (LOCAL_DEFAULT_BITRATE_KBPS > 0) return LOCAL_DEFAULT_BITRATE_KBPS;
         int width = getWidthFromResolutionString(resString);
         int height = getHeightFromResolutionString(resString);
         int fps = Integer.parseInt(fpsString);

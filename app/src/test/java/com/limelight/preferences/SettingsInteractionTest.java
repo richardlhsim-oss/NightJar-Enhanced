@@ -217,7 +217,7 @@ public class SettingsInteractionTest {
         assertNotEquals("1920x1080", screen);
         int savedDefault = PreferenceConfiguration.getDefaultBitrate("1920x1080", "60");
         int screenDefault = PreferenceConfiguration.getDefaultBitrate(screen, "60");
-        assertNotEquals(savedDefault, screenDefault);
+        // NightJar Enhanced: the default no longer depends on size, so savedDefault equals screenDefault.
         // {stored bitrate, user-set flag (null: an install from before the flag), bitrate streamed}
         Object[][] cases = {
                 // Picked by the user, even when it equals the saved size's default.
