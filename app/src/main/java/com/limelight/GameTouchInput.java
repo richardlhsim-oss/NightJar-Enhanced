@@ -93,7 +93,7 @@ final class GameTouchInput {
     private static final int CLICK_HOLD_MS = 40, CLICK_GAP_MS = 60;
     private boolean edgeDownRight, edgeDownTop;
     // Each corner zone: this share of the screen's width in from its side, and of its height from its top or bottom.
-    private static final float EDGE_ZONE_WIDTH_SHARE = 0.1f, EDGE_ZONE_HEIGHT_SHARE = 0.3f;
+    private static final float EDGE_ZONE_WIDTH_SHARE = 0.15f, EDGE_ZONE_HEIGHT_SHARE = 0.4f;
     // The top-right zone, which shows the keyboard, is taller.
     private static final float TOP_RIGHT_ZONE_HEIGHT_SHARE = 0.45f;
     private MotionEvent edgeDown;
