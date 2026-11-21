@@ -36,7 +36,7 @@ public final class ShortcutPanel {
     }
 
     private static final int TILE_MIN_WIDTH_DP = 44, TILE_HEIGHT_DP = 32, ICON_DP = 16, GAP_DP = 2, ROWS = 2, SWIPE_DP = 24;
-    private static final int EXCLUSION_WIDTH_DP = 48, EXCLUSION_HEIGHT_DP = 200, EXCLUSION_RIGHT_TOP_DP = 160;
+    private static final int EXCLUSION_WIDTH_DP = 48, EXCLUSION_HEIGHT_DP = 200, EXCLUSION_RIGHT_TOP_DP = 100;
 
     private final Context context;
     private final Host host;
@@ -140,7 +140,7 @@ public final class ShortcutPanel {
             // Android keeps this edge for Back unless excluded; the bottom edge cannot be claimed at all.
             // Android grants 200 dp of each side, for the corner swipes; the middle keeps Back.
             int edgeWidth = Math.round(EXCLUSION_WIDTH_DP * density), edgeHeight = Math.round(EXCLUSION_HEIGHT_DP * density) / 2;
-            // The right side gives most of its share to the taller top-right zone.
+            // The right side splits its share between the top and bottom keyboard zones.
             int rightTop = Math.round(EXCLUSION_RIGHT_TOP_DP * density), rightBottom = Math.round((EXCLUSION_HEIGHT_DP - EXCLUSION_RIGHT_TOP_DP) * density);
             parent.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> parent.setSystemGestureExclusionRects(java.util.Arrays.asList(
                     new android.graphics.Rect(0, 0, edgeWidth, edgeHeight),

@@ -269,6 +269,8 @@ final class GameKeyboardInput {
 
     private void checkBriefKeyboard() {
         if (!briefKeyboard) return;
+        // Voice typing sends nothing until speech is recognised, so the keyboard stays while it listens.
+        if (keyboardListening()) lastTypedAt = SystemClock.uptimeMillis();
         long idle = SystemClock.uptimeMillis() - lastTypedAt;
         if (idle < BRIEF_KEYBOARD_MS) {
             game.keyboardPanHandler.postDelayed(briefKeyboardCheck, BRIEF_KEYBOARD_MS - idle);
@@ -276,6 +278,16 @@ final class GameKeyboardInput {
         }
         briefKeyboard = false;
         if (hostKeyboard.visible()) game.toggleKeyboard();
+    }
+    // A keyboard's voice typing records as VOICE_RECOGNITION; the PC microphone never does.
+    private boolean keyboardListening() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false;
+        android.media.AudioManager audio = game.getSystemService(android.media.AudioManager.class);
+        if (audio == null) return false;
+        for (android.media.AudioRecordingConfiguration recording : audio.getActiveRecordingConfigurations()) {
+            if (recording.getClientAudioSource() == android.media.MediaRecorder.AudioSource.VOICE_RECOGNITION) return true;
+        }
+        return false;
     }
     // How much of the window's bottom the soft keyboard covers, from the last inset dispatch.
     private int keyboardInsetBottom;
